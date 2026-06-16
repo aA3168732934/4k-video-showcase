@@ -1,0 +1,36 @@
+{
+  "site": {
+    "name_en": "4K Video Showcase",
+    "name_ar": "مكتبة فيديو 4K",
+    "tagline_en": "Premium 4K stock footage for creators",
+    "tagline_ar": "لقطات فيديو 4K متميزة للمبدعين",
+    "domain": "https://yourdomain.com"
+  },
+  "contact": {
+    "whatsapp_url": "https://wa.me/971500000000",
+    "whatsapp_group": "https://chat.whatsapp.com/INVITE_LINK_HERE",
+    "whatsapp_label_en": "Chat on WhatsApp",
+    "whatsapp_label_ar": "تواصل عبر واتساب",
+    "email": "contact@yourdomain.com",
+    "telegram": "https://t.me/yourusername"
+  },
+  "facebook": {
+    "pixel_id": "1346108727731634",
+    "pixel_backup": "",
+    "page_id": "",
+    "page_url": ""
+  },
+  "seo": {
+    "title_en": "4K Video Library - Premium Stock Footage",
+    "title_ar": "مكتبة فيديو 4K - لقطات متميزة",
+    "description_en": "Browse 100+ premium 4K video clips for your projects. Nature, city, business, lifestyle footage available for instant delivery.",
+    "description_ar": "تصفح أكثر من 100 مقطع فيديو 4K متميز لمشاريعك. لقطات طبيعة ومدينة وأعمال متاحة للتسليم الفوري.",
+    "keywords": "4k video, stock footage, premium video, video素材, 中东4K视频"
+  },
+  "appearance": {
+    "primary_color": "#d4af37",
+    "background_color": "#0a0a0a",
+    "card_color": "#1a1a1a"
+  },
+  "updated_at": "2026-06-16"
+}

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading...</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="lang-loading">Loading...</div>
+  <script>
+    // 立即读取 config 和 products 注入页面
+    (async function() {
+      try {
+        const [configRes, productsRes] = await Promise.all([
+          fetch('config.json'),
+          fetch('data/products.json')
+        ]);
+        const config = await configRes.json();
+        const products = await productsRes.json();
+        renderPage(config, products);
+      } catch (e) {
+        document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#888">Site is being updated. Please refresh in a moment.</div>';
+      }
+    })();
+
+    function renderPage(config, products) {
+      const lang = localStorage.getItem('lang') || 'en';
+      const t = (en, ar) => lang === 'ar' ? ar : en;
+      const dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+      document.documentElement.lang = lang;
+      document.documentElement.dir = dir;
+      document.title = config.seo['title_' + lang];
+
+      // Meta tags
+      document.querySelector('meta[name=description]')?.setAttribute('content', config.seo['description_' + lang]);
+
+      // Facebook Pixel
+      if (config.facebook.pixel_id) {
+        const noscript = document.createElement('noscript');
+        noscript.innerHTML = '<img height="1" width="1" alt="" src="https://www.facebook.com/tr?id=' + config.facebook.pixel_id + '&ev=PageView&noscript=1"/>';
+        document.head.appendChild(noscript);
+      }
+
+      const featured = products.filter(p => p.featured);
+      const all = products.filter(p => p.in_stock);
+
+      const productCard = (p) => `
+        <div class="card" data-id="${p.id}">
+          <div class="thumb-wrap">
+            <img src="${p.thumbnail}" alt="${p['title_' + lang]}" loading="lazy" />
+            <span class="badge">${p.resolution}</span>
+            <span class="duration">${p.duration}</span>
+          </div>
+          <div class="card-body">
+            <h3>${p['title_' + lang]}</h3>
+            <p>${(p['description_' + lang] || '').substring(0, 90)}...</p>
+            <div class="card-foot">
+              <span class="price">$${p.price}</span>
+              <a class="btn-wa" target="_blank" rel="noopener"
+                 href="${config.contact.whatsapp_url}?text=${encodeURIComponent('Hi, I want to buy: ' + p['title_en'] + ' (ID:' + p.id + ')')}"
+                 onclick="trackLead(${p.id}, '${p['title_en'].replace(/'/g, '')}')">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+                ${t('Buy', 'اشترِ')}
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.innerHTML = `
+        <header class="topbar">
+          <div class="logo">${config.site['name_' + lang]}</div>
+          <div class="topbar-actions">
+            <button class="lang-toggle" onclick="toggleLang()">
+              ${lang === 'en' ? 'العربية' : 'English'}
+            </button>
+            <a class="wa-top" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+              ${t('WhatsApp', 'واتساب')}
+            </a>
+          </div>
+        </header>
+
+        <section class="hero">
+          <h1>${config.site['name_' + lang]}</h1>
+          <p>${config.site['tagline_' + lang]}</p>
+          <div class="hero-stats">
+            <div><strong>${all.length}+</strong><span>${t('Videos', 'فيديو')}</span></div>
+            <div><strong>4K</strong><span>${t('Resolution', 'الدقة')}</span></div>
+            <div><strong>${t('Instant', 'فوري')}</strong><span>${t('Delivery', 'التسليم')}</span></div>
+          </div>
+        </section>
+
+        ${featured.length > 0 ? `
+        <section class="section">
+          <h2 class="section-title">${t('Featured Videos', 'الفيديوهات المميزة')}</h2>
+          <div class="grid">
+            ${featured.map(productCard).join('')}
+          </div>
+        </section>
+        ` : ''}
+
+        <section class="section">
+          <h2 class="section-title">${t('All Videos', 'جميع الفيديوهات')}</h2>
+          <div class="search-box">
+            <input type="text" id="search" placeholder="${t('Search videos...', 'ابحث عن فيديو...')}" />
+          </div>
+          <div class="grid" id="all-grid">
+            ${all.map(productCard).join('')}
+          </div>
+        </section>
+
+        <section class="cta-section">
+          <h2>${t('Need Custom Footage?', 'تحتاج لقطات مخصصة؟')}</h2>
+          <p>${t('Contact us on WhatsApp for custom requests and bulk pricing.', 'تواصل معنا عبر واتساب للطلبات المخصصة والأسعار بالجملة.')}</p>
+          <a class="btn-cta" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('Hi, I need custom 4K footage', 'مرحباً، أحتاج لقطات 4K مخصصة'))}">
+            ${t('Contact on WhatsApp', 'تواصل عبر واتساب')}
+          </a>
+        </section>
+
+        <footer>
+          <p>© ${new Date().getFullYear()} ${config.site['name_' + lang]}. ${t('All rights reserved.', 'جميع الحقوق محفوظة.')}</p>
+        </footer>
+
+        <a class="wa-float" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('Hi, I am interested in your 4K videos', 'مرحباً، أنا مهتم بفيديوهات 4K الخاصة بكم'))}" onclick="trackContact()" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+        </a>
+      `;
+
+      // Search
+      const search = document.getElementById('search');
+      if (search) {
+        search.addEventListener('input', (e) => {
+          const q = e.target.value.toLowerCase();
+          document.querySelectorAll('#all-grid .card').forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(q) ? '' : 'none';
+          });
+        });
+      }
+    }
+
+    function toggleLang() {
+      const cur = localStorage.getItem('lang') || 'en';
+      localStorage.setItem('lang', cur === 'en' ? 'ar' : 'en');
+      location.reload();
+    }
+
+    function trackLead(id, name) {
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Lead', { content_ids: [id], content_name: name });
+      }
+    }
+    function trackContact() {
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Contact');
+      }
+    }
+  </script>
+
+  <script>
+    // Facebook Pixel init (will be replaced from config in production)
+    window.__PIXEL_ID__ = '__FB_PIXEL_ID_PLACEHOLDER__';
+  </script>
+  <script>
+    (function() {
+      // Read pixel id from config dynamically
+      fetch('config.json').then(r => r.json()).then(cfg => {
+        const id = cfg.facebook.pixel_id;
+        if (!id) return;
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', id);
+        fbq('track', 'PageView');
+      });
+    })();
+  </script>
+</body>
+</html>
