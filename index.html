@@ -72,6 +72,10 @@
       document.body.innerHTML = `
         <header class="topbar">
           <div class="logo">${config.site['name_' + lang]}</div>
+          <nav class="topbar-nav">
+            <a href="index.html" class="nav-link active">${t('Videos', 'الفيديوهات')}</a>
+            <a href="tools.html" class="nav-link">${t('Tools', 'الأدوات')}</a>
+          </nav>
           <div class="topbar-actions">
             <button class="lang-toggle" onclick="toggleLang()">
               ${lang === 'en' ? 'العربية' : 'English'}

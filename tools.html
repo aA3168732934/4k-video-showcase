@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading...</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="tools.css">
+</head>
+<body>
+  <div class="lang-loading">Loading...</div>
+  
+  <script>
+    // 立即读取 config 注入页面
+    (async function() {
+      try {
+        const [configRes, productsRes] = await Promise.all([
+          fetch('config.json'),
+          fetch('data/products.json')
+        ]);
+        const config = await configRes.json();
+        const products = await productsRes.json();
+        renderToolsPage(config, products);
+      } catch (e) {
+        document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#888">Site is being updated. Please refresh in a moment.</div>';
+      }
+    })();
+
+    function renderToolsPage(config, products) {
+      const lang = localStorage.getItem('lang') || 'en';
+      const t = (en, ar) => lang === 'ar' ? ar : en;
+      const dir = lang === 'ar' ? 'rtl' : 'ltr';
+      
+      document.documentElement.lang = lang;
+      document.documentElement.dir = dir;
+      document.title = t('Cross-Border Tools - ', 'أدوات التجارة العابرة للحدود - ') + config.site['name_' + lang];
+      
+      // Facebook Pixel
+      if (config.facebook.pixel_id) {
+        const noscript = document.createElement('noscript');
+        noscript.innerHTML = '<img height="1" width="1" alt="" src="https://www.facebook.com/tr?id=' + config.facebook.pixel_id + '&ev=PageView&noscript=1"/>';
+        document.head.appendChild(noscript);
+      }
+
+      const toolCards = [
+        {
+          id: 'product-selection',
+          icon: '📦',
+          title_en: 'Product Selection',
+          title_ar: 'اختيار المنتج',
+          desc_en: 'Analyze market trends and find winning products for your cross-border business.',
+          desc_ar: 'تحليل اتجاهات السوق والعثور على المنتجات الرابحة لعملك التجاري العابر للحدود.',
+          features_en: ['Trend Analysis', 'Profit Calculator', 'Competitor Insights'],
+          features_ar: ['تحليل الاتجاهات', 'حاسبة الأرباح', 'رؤى المنافسين']
+        },
+        {
+          id: 'competitor-analysis',
+          icon: '📊',
+          title_en: 'Competitor Analysis',
+          title_ar: 'تحليل المنافسين',
+          desc_en: 'Monitor competitor pricing, reviews, and sales strategies in real-time.',
+          desc_ar: 'راقب تسعير المنافسين والمراجعات واستراتيجيات المبيعات في الوقت الفعلي.',
+          features_en: ['Price Tracking', 'Review Analysis', 'Sales Estimation'],
+          features_ar: ['تتبع السعر', 'تحليل المراجعات', 'تقدير المبيعات']
+        },
+        {
+          id: 'multi-platform',
+          icon: '🌐',
+          title_en: 'Multi-Platform Manager',
+          title_ar: 'مدير متعدد المنصات',
+          desc_en: 'Manage all your cross-border stores from one dashboard. Sync inventory automatically.',
+          desc_ar: 'أدر جميع متاجرك العابرة للحدود من لوحة تحكم واحدة. مزامنة المخزون تلقائياً.',
+          features_en: ['Amazon', 'Shopee', 'Lazada', 'eBay'],
+          features_ar: ['أمازون', 'شوبي', 'لازادا', 'إيبي']
+        },
+        {
+          id: 'data-analysis',
+          icon: '📈',
+          title_en: 'Data Analytics',
+          title_ar: 'تحليلات البيانات',
+          desc_en: 'Visualize your sales performance with interactive charts and export reports.',
+          desc_ar: 'تصور أداء مبيعاتك مع المخططات التفاعلية وتصدير التقارير.',
+          features_en: ['Sales Trends', 'Profit Reports', 'Regional Analysis'],
+          features_ar: ['اتجاهات المبيعات', 'تقارير الأرباح', 'التحليل الإقليمي']
+        },
+        {
+          id: 'automation',
+          icon: '🤖',
+          title_en: 'Automation Tools',
+          title_ar: 'أدوات الأتمتة',
+          desc_en: 'Automate replies, order processing, and customer follow-ups to save time.',
+          desc_ar: 'أتمتة الردود ومعالجة الطلبات ومتابعة العملاء لتوفير الوقت.',
+          features_en: ['Auto-Reply', 'Order Sync', 'Review Requests'],
+          features_ar: ['الرد التلقائي', 'مزامنة الطلبات', 'طلبات المراجعة']
+        }
+      ];
+
+      const toolCardHTML = (tool) => `
+        <div class="tool-card" data-id="${tool.id}" onclick="openTool('${tool.id}')">
+          <div class="tool-icon">${tool.icon}</div>
+          <h3>${t(tool.title_en, tool.title_ar)}</h3>
+          <p>${t(tool.desc_en, tool.desc_ar)}</p>
+          <div class="tool-features">
+            ${t(tool.features_en, tool.features_ar).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+          </div>
+          <div class="tool-action">
+            <span class="btn-try">${t('Try Now', 'جرب الآن')} →</span>
+          </div>
+        </div>
+      `;
+
+      document.body.innerHTML = `
+        <header class="topbar">
+          <div class="logo">${config.site['name_' + lang]}</div>
+          <nav class="topbar-nav">
+            <a href="index.html" class="nav-link">${t('Videos', 'الفيديوهات')}</a>
+            <a href="tools.html" class="nav-link active">${t('Tools', 'الأدوات')}</a>
+          </nav>
+          <div class="topbar-actions">
+            <button class="lang-toggle" onclick="toggleLang()">
+              ${lang === 'en' ? 'العربية' : 'English'}
+            </button>
+            <a class="wa-top" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+              ${t('WhatsApp', 'واتساب')}
+            </a>
+          </div>
+        </header>
+
+        <section class="hero-tools">
+          <h1>${t('Cross-Border Seller Tools', 'أدوات بائع التجارة العابرة للحدود')}</h1>
+          <p>${t('Professional tools to help you succeed in cross-border e-commerce. All tools are free to try!', 'أدوات احترافية لمساعدتك في النجاح في التجارة الإلكترونية العابرة للحدود. جميع الأدوات مجانية للتجربة!')}</p>
+          <div class="hero-stats">
+            <div><strong>5+</strong><span>${t('Pro Tools', 'أدوات احترافية')}</span></div>
+            <div><strong>100%</strong><span>${t('Free Trial', 'تجربة مجانية')}</span></div>
+            <div><strong>24/7</strong><span>${t('Online', 'متوافر عبر الإنترنت')}</span></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">${t('All Tools', 'جميع الأدوات')}</h2>
+          <div class="tools-grid" id="tools-grid">
+            ${toolCards.map(toolCardHTML).join('')}
+          </div>
+        </section>
+
+        <div class="tool-modal" id="tool-modal">
+          <div class="modal-content">
+            <button class="modal-close" onclick="closeTool()">×</button>
+            <div class="modal-body" id="modal-body"></div>
+          </div>
+        </div>
+
+        <section class="cta-section">
+          <h2>${t('Need Custom Tools?', 'تحتاج أدوات مخصصة؟')}</h2>
+          <p>${t('Contact us on WhatsApp for custom tool development and bulk pricing.', 'تواصل معنا عبر واتساب لتطوير أدوات مخصصة وأسعار الجملة.')}</p>
+          <a class="btn-cta" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('Hi, I need custom cross-border tools', 'مرحباً، أحتاج أدوات تجارة عابرة للحدود مخصصة'))}">
+            ${t('Contact on WhatsApp', 'تواصل عبر واتساب')}
+          </a>
+        </section>
+
+        <footer>
+          <p>© ${new Date().getFullYear()} ${config.site['name_' + lang]}. ${t('All rights reserved.', 'جميع الحقوق محفوظة.')}</p>
+        </footer>
+
+        <a class="wa-float" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('Hi, I am interested in your tools', 'مرحباً، أنا مهتم بأدواتكم'))}" onclick="trackContact()" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+        </a>
+      `;
+
+      // 为 toolCards 添加 map 函数的 polyfill（如果需要）
+      // 实际上在上面模板字符串中已经处理了
+    }
+
+    function toggleLang() {
+      const cur = localStorage.getItem('lang') || 'en';
+      localStorage.setItem('lang', cur === 'en' ? 'ar' : 'en');
+      location.reload();
+    }
+
+    function openTool(toolId) {
+      const lang = localStorage.getItem('lang') || 'en';
+      const t = (en, ar) => lang === 'ar' ? ar : en;
+      
+      const toolContents = {
+        'product-selection': {
+          title_en: 'Product Selection Tool',
+          title_ar: 'أداة اختيار المنتج',
+          content: `
+            <h2>${t('Product Selection Tool', 'أداة اختيار المنتج')}</h2>
+            <div class="tool-form">
+              <div class="form-group">
+                <label>${t('Product Category', 'فئة المنتج')}</label>
+                <select>
+                  <option>${t('Electronics', 'إلكترونيات')}</option>
+                  <option>${t('Fashion', 'أزياء')}</option>
+                  <option>${t('Home & Garden', 'منزل وحديقة')}</option>
+                  <option>${t('Beauty & Health', 'جمال وصحة')}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>${t('Target Market', 'السوق المستهدف')}</label>
+                <select>
+                  <option>USA</option>
+                  <option>UAE</option>
+                  <option>Saudi Arabia</option>
+                  <option>Europe</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>${t('Price Range (USD)', 'نطاق السعر (دولار)')}</label>
+                <input type="range" min="0" max="1000" value="100">
+              </div>
+              <button class="btn-cta" onclick="showToolResult('product-selection')">${t('Analyze', 'تحليل')}</button>
+            </div>
+            <div id="tool-result"></div>
+          `
+        },
+        'competitor-analysis': {
+          title_en: 'Competitor Analysis Tool',
+          title_ar: 'أداة تحليل المنافسين',
+          content: `
+            <h2>${t('Competitor Analysis Tool', 'أداة تحليل المنافسين')}</h2>
+            <div class="tool-form">
+              <div class="form-group">
+                <label>${t('Competitor Store URL', 'رابط متجر المنافس')}</label>
+                <input type="text" placeholder="https://...">
+              </div>
+              <div class="form-group">
+                <label>${t('Platform', 'المنصة')}</label>
+                <select>
+                  <option>Amazon</option>
+                  <option>Shopee</option>
+                  <option>Lazada</option>
+                  <option>eBay</option>
+                </select>
+              </div>
+              <button class="btn-cta" onclick="showToolResult('competitor-analysis')">${t('Analyze', 'تحليل')}</button>
+            </div>
+            <div id="tool-result"></div>
+          `
+        },
+        'multi-platform': {
+          title_en: 'Multi-Platform Manager',
+          title_ar: 'مدير متعدد المنصات',
+          content: `
+            <h2>${t('Multi-Platform Manager', 'مدير متعدد المنصات')}</h2>
+            <div class="tool-form">
+              <p style="color:var(--text-dim);margin-bottom:20px">${t('Connect your stores to manage them from one place.', 'اربط متاجرك لإدارتها من مكان واحد.')}</p>
+              <div class="platform-cards">
+                <div class="platform-card">
+                  <h3>Amazon</h3>
+                  <button class="btn-connect">${t('Connect', 'اربط')}</button>
+                </div>
+                <div class="platform-card">
+                  <h3>Shopee</h3>
+                  <button class="btn-connect">${t('Connect', 'اربط')}</button>
+                </div>
+                <div class="platform-card">
+                  <h3>Lazada</h3>
+                  <button class="btn-connect">${t('Connect', 'اربط')}</button>
+                </div>
+                <div class="platform-card">
+                  <h3>eBay</h3>
+                  <button class="btn-connect">${t('Connect', 'اربط')}</button>
+                </div>
+              </div>
+            </div>
+          `
+        },
+        'data-analysis': {
+          title_en: 'Data Analytics Tool',
+          title_ar: 'أداة تحليل البيانات',
+          content: `
+            <h2>${t('Data Analytics Tool', 'أداة تحليل البيانات')}</h2>
+            <div class="tool-form">
+              <div class="form-group">
+                <label>${t('Upload Sales Data (CSV)', 'ارفع بيانات المبيعات (CSV)')}</label>
+                <input type="file" accept=".csv">
+              </div>
+              <div class="form-group">
+                <label>${t('Analysis Type', 'نوع التحليل')}</label>
+                <select>
+                  <option>${t('Sales Trend', 'اتجاه المبيعات')}</option>
+                  <option>${t('Profit Analysis', 'تحليل الأرباح')}</option>
+                  <option>${t('Regional Distribution', 'التوزيع الإقليمي')}</option>
+                </select>
+              </div>
+              <button class="btn-cta" onclick="showToolResult('data-analysis')">${t('Analyze', 'تحليل')}</button>
+            </div>
+            <div id="tool-result"></div>
+          `
+        },
+        'automation': {
+          title_en: 'Automation Tools',
+          title_ar: 'أدوات الأتمتة',
+          content: `
+            <h2>${t('Automation Tools', 'أدوات الأتمتة')}</h2>
+            <div class="tool-form">
+              <div class="automation-options">
+                <div class="auto-option">
+                  <h3>${t('Auto-Reply', 'الرد التلقائي')}</h3>
+                  <p>${t('Automatically reply to customer messages based on keywords.', 'الرد تلقائياً على رسائل العملاء بناءً على الكلمات المفتاحية.')}</p>
+                  <button class="btn-connect">${t('Setup', 'إعداد')}</button>
+                </div>
+                <div class="auto-option">
+                  <h3>${t('Order Sync', 'مزامنة الطلبات')}</h3>
+                  <p>${t('Sync orders from all platforms to one dashboard.', 'مزامنة الطلبات من جميع المنصات إلى لوحة تحكم واحدة.')}</p>
+                  <button class="btn-connect">${t('Setup', 'إعداد')}</button>
+                </div>
+                <div class="auto-option">
+                  <h3>${t('Review Request', 'طلب مراجعة')}</h3>
+                  <p>${t('Automatically send review request emails to customers.', 'إرسال رسائل طلب مراجعة للعملاء تلقائياً.')}</p>
+                  <button class="btn-connect">${t('Setup', 'إعداد')}</button>
+                </div>
+              </div>
+            </div>
+          `
+        }
+      };
+
+      const tool = toolContents[toolId];
+      if (!tool) return;
+
+      document.getElementById('modal-body').innerHTML = tool.content;
+      document.getElementById('tool-modal').classList.add('active');
+    }
+
+    function closeTool() {
+      document.getElementById('tool-modal').classList.remove('active');
+    }
+
+    function showToolResult(toolId) {
+      const lang = localStorage.getItem('lang') || 'en';
+      const t = (en, ar) => lang === 'ar' ? ar : en;
+      
+      document.getElementById('tool-result').innerHTML = `
+        <div class="result-box">
+          <h3>${t('Analysis Result', 'نتيجة التحليل')}</h3>
+          <p style="color:var(--text-dim)">${t('This is a demo result. Contact us on WhatsApp to get full access to this tool.', 'هذه نتيجة تجريبية. تواصل معنا عبر واتساب للحصول على الوصول الكامل لهذه الأدة.')}</p>
+          <div style="margin-top:20px;padding:20px;background:var(--card);border-radius:8px;">
+            <p>📊 ${t('Sample data visualization would appear here.', 'عرض بيانات تجريبي سيظهر هنا.')}</p>
+          </div>
+          <a class="btn-cta" style="margin-top:20px;display:inline-block" target="_blank" href="#" onclick="trackLead()">
+            ${t('Get Full Access on WhatsApp', 'احصل على الوصول الكامل عبر واتساب')}
+          </a>
+        </div>
+      `;
+    }
+
+    function trackLead() {
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Lead');
+      }
+    }
+
+    function trackContact() {
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Contact');
+      }
+    }
+
+    // 关闭模态框当点击背景
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('tool-modal')) {
+        closeTool();
+      }
+    });
+  </script>
+
+  <script>
+    // Facebook Pixel init
+    (function() {
+      fetch('config.json').then(r => r.json()).then(cfg => {
+        const id = cfg.facebook.pixel_id;
+        if (!id) return;
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', id);
+        fbq('track', 'PageView');
+      });
+    })();
+  </script>
+</body>
+</html>
