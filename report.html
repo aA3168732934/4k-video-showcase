@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>跨境电商海关数据分析报告 | Cross-Border E-commerce Customs Data Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      line-height: 1.8;
+    }
+    
+    /* 顶部导航 */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(10,10,10,0.95);
+      border-bottom: 1px solid #1a1a1a;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+    
+    .topbar .logo {
+      font-size: 18px; font-weight: 700;
+      background: linear-gradient(135deg, #d4af37, #f5d76e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .topbar-actions { display: flex; align-items: center; gap: 16px; }
+    
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a {
+      color: #888; text-decoration: none; font-size: 14px;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: #d4af37; }
+    
+    .lang-btn {
+      background: rgba(212,175,55,0.1);
+      border: 1px solid rgba(212,175,55,0.3);
+      color: #d4af37; padding: 6px 14px;
+      border-radius: 6px; cursor: pointer;
+      font-size: 13px; transition: all 0.2s;
+    }
+    .lang-btn:hover { background: rgba(212,175,55,0.2); }
+    
+    /* 主容器 */
+    .container {
+      max-width: 1000px; margin: 0 auto;
+      padding: 80px 24px 60px;
+    }
+    
+    /* 报告头部 */
+    .report-header {
+      text-align: center;
+      padding: 60px 0 40px;
+      border-bottom: 1px solid #1a1a1a;
+      margin-bottom: 40px;
+    }
+    
+    .report-header h1 {
+      font-size: 32px; font-weight: 700;
+      background: linear-gradient(135deg, #d4af37, #f5d76e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+    
+    .report-header .subtitle {
+      color: #888; font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .report-meta {
+      display: flex; justify-content: center; gap: 24px;
+      flex-wrap: wrap; margin-top: 20px;
+    }
+    
+    .report-meta span {
+      background: rgba(212,175,55,0.08);
+      border: 1px solid rgba(212,175,55,0.2);
+      padding: 6px 14px;
+      border-radius: 20px; font-size: 13px;
+      color: #b8960f;
+    }
+    
+    /* 章节 */
+    .section {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 22px; font-weight: 700;
+      color: #d4af37;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    
+    .section-subtitle {
+      font-size: 17px; font-weight: 600;
+      color: #c0c0c0;
+      margin: 24px 0 12px;
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    
+    .data-table th {
+      background: rgba(212,175,55,0.1);
+      color: #d4af37;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    
+    .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1a1a1a;
+      color: #c0c0c0;
+    }
+    
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    
+    /* 数据卡片 */
+    .data-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    
+    .data-card {
+      background: #0a0a0a;
+      border: 1px solid #1a1a1a;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .data-card .value {
+      font-size: 28px; font-weight: 700;
+      color: #d4af37;
+      margin-bottom: 6px;
+    }
+    
+    .data-card .label {
+      font-size: 13px; color: #888;
+    }
+    
+    .data-card .change {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    
+    .change.up { color: #4caf50; }
+    .change.down { color: #f44336; }
+    
+    /* 条形图 */
+    .bar-chart {
+      margin: 20px 0;
+    }
+    
+    .bar-item {
+      display: flex; align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .bar-label {
+      width: 160px; font-size: 13px;
+      color: #a0a0a0; text-align: right;
+      padding-right: 12px;
+    }
+    
+    .bar-track {
+      flex: 1; height: 24px;
+      background: #1a1a1a;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #d4af37, #f5d76e);
+      transition: width 0.6s ease;
+      display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 8px; font-size: 12px;
+      color: #000; font-weight: 600;
+    }
+    
+    /* 引用块 */
+    .insight-box {
+      background: rgba(212,175,55,0.05);
+      border-left: 3px solid #d4af37;
+      padding: 16px 20px;
+      margin: 16px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      color: #b8b8b8;
+    }
+    
+    .insight-box strong { color: #d4af37; }
+    
+    /* 列表 */
+    .bullet-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    
+    .bullet-list li {
+      padding: 8px 0 8px 24px;
+      position: relative;
+      font-size: 14px;
+      color: #c0c0c0;
+    }
+    
+    .bullet-list li::before {
+      content: '▸';
+      position: absolute; left: 0;
+      color: #d4af37;
+    }
+    
+    /* 页脚 */
+    .report-footer {
+      text-align: center;
+      padding: 40px 0;
+      color: #555; font-size: 13px;
+      border-top: 1px solid #1a1a1a;
+      margin-top: 40px;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .container { padding: 70px 16px 40px; }
+      .report-header h1 { font-size: 24px; }
+      .section { padding: 20px; }
+      .data-cards { grid-template-columns: 1fr 1fr; }
+      .bar-label { width: 100px; font-size: 12px; }
+      .data-table { font-size: 12px; }
+      .data-table th, .data-table td { padding: 8px 10px; }
+      .nav-links { display: none; }
+    }
+    
+    @media (max-width: 480px) {
+      .data-cards { grid-template-columns: 1fr; }
+    }
+    
+    /* 打印样式 */
+    @media print {
+      body { background: #fff; color: #000; }
+      .topbar { display: none; }
+      .lang-btn { display: none; }
+      .section { background: #fff; border: 1px solid #ddd; }
+      .data-table th { background: #f5f5f5; color: #000; }
+      .data-table td { color: #000; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<header class="topbar">
+  <div class="logo" data-t="跨境电商数据报告|CBEC Data Report">跨境电商数据报告</div>
+  <div class="topbar-actions">
+    <nav class="nav-links">
+      <a href="index.html" data-t="首页|Home">首页</a>
+      <a href="tools.html" data-t="工具|Tools">工具</a>
+      <a href="report.html" class="active" data-t="报告|Report">报告</a>
+    </nav>
+    <button class="lang-btn" onclick="toggleLang()">
+      <span id="langBtnText">EN</span>
+    </button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 报告头部 -->
+  <div class="report-header">
+    <div class="subtitle" data-t="报告生成时间：2026年6月20日|Report Date: June 20, 2026">报告生成时间：2026年6月20日</div>
+    <h1 data-t="中国跨境电商海关数据分析报告（2024-2025年）|China Cross-Border E-commerce Customs Data Report (2024-2025)">中国跨境电商海关数据分析报告（2024-2025年）</h1>
+    <div class="subtitle" data-t="数据来源：中华人民共和国海关总署、国家统计局、商务部|Data Source: General Administration of Customs, National Bureau of Statistics, Ministry of Commerce">数据来源：中华人民共和国海关总署、国家统计局、商务部</div>
+    <div class="report-meta">
+      <span data-t="📊 跨境电商规模：2.84万亿元|📊 CBEC Scale: 2.84 trillion CNY">📊 跨境电商规模：2.84万亿元</span>
+      <span data-t="📈 同比增长：+4.8%|📈 YoY Growth: +4.8%">📈 同比增长：+4.8%</span>
+      <span data-t="🌐 覆盖市场：全球|🌐 Coverage: Global">🌐 覆盖市场：全球</span>
+    </div>
+  </div>
+
+  <!-- 一、中国外贸总体数据 -->
+  <div class="section">
+    <div class="section-title">一、中国外贸总体数据（2024-2025年）</div>
+    
+    <div class="section-subtitle" data-t="1.1 年度进出口总值对比|1.1 Annual Import/Export Total Value Comparison">1.1 年度进出口总值对比</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="指标|Indicator">指标</th>
+          <th data-t="2024年|2024">2024年</th>
+          <th data-t="2025年|2025">2025年</th>
+          <th data-t="同比增长|YoY Growth">同比增长</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-t="进出口总值|Total Import/Export">进出口总值</td>
+          <td>43.85万亿元</td>
+          <td>45.47万亿元</td>
+          <td style="color:#4caf50;font-weight:600;">+3.8%</td>
+        </tr>
+        <tr>
+          <td data-t="出口总值|Export Total">出口总值</td>
+          <td>25.45万亿元</td>
+          <td>26.99万亿元</td>
+          <td style="color:#4caf50;font-weight:600;">+6.1%</td>
+        </tr>
+        <tr>
+          <td data-t="进口总值|Import Total">进口总值</td>
+          <td>18.39万亿元</td>
+          <td>18.48万亿元</td>
+          <td style="color:#4caf50;font-weight:600;">+0.5%</td>
+        </tr>
+        <tr>
+          <td data-t="贸易顺差|Trade Surplus">贸易顺差</td>
+          <td>7.06万亿元</td>
+          <td>8.51万亿元</td>
+          <td style="color:#4caf50;font-weight:600;">+20.5%</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="insight-box">
+      <strong data-t="核心结论：|Key Conclusions:">核心结论：</strong>
+      <span data-t="2025年进出口总值首次突破45万亿元，创历史新高；中国连续9年实现外贸增长（2017-2025）；出口增速（6.1%）显著高于进口增速（0.5%）。|In 2025, total import/export value exceeded 45 trillion CNY for the first time, setting a new historical record. China has achieved 9 consecutive years of foreign trade growth (2017-2025). Export growth (6.1%) significantly outpaced import growth (0.5%).">2025年进出口总值首次突破45万亿元，创历史新高；中国连续9年实现外贸增长（2017-2025）；出口增速（6.1%）显著高于进口增速（0.5%）。</span>
+    </div>
+  </div>
+
+  <!-- 二、跨境电商专项数据 -->
+  <div class="section">
+    <div class="section-title">二、跨境电商专项数据</div>
+    
+    <div class="section-subtitle" data-t="2.1 跨境电商进出口规模（2024-2025年）|2.1 CBEC Import/Export Scale (2024-2025)">2.1 跨境电商进出口规模（2024-2025年）</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="指标|Indicator">指标</th>
+          <th data-t="2024年|2024">2024年</th>
+          <th data-t="2025年|2025">2025年</th>
+          <th data-t="同比增长|YoY Growth">同比增长</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-t="跨境电商总规模|Total CBEC Scale">跨境电商总规模</td>
+          <td>2.71万亿元</td>
+          <td>2.84万亿元</td>
+          <td style="color:#4caf50;font-weight:600;">+4.8%</td>
+        </tr>
+        <tr>
+          <td data-t="出口|Export">出口</td>
+          <td>2.15万亿元</td>
+          <td>2.27万亿元</td>
+          <td style="color:#4caf50;font-weight:600;">+5.4%</td>
+        </tr>
+        <tr>
+          <td data-t="进口|Import">进口</td>
+          <td>5552.5亿元</td>
+          <td>5702亿元</td>
+          <td style="color:#4caf50;font-weight:600;">+2.7%</td>
+        </tr>
+        <tr>
+          <td data-t="占外贸总值比重|Share of Total Trade">占外贸总值比重</td>
+          <td>6.2%</td>
+          <td>6.2%</td>
+          <td style="color:#888;">持平</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="section-subtitle" data-t="2.2 跨境电商出口 vs 进口结构（2025年）|2.2 CBEC Export vs Import Structure (2025)">2.2 跨境电商出口 vs 进口结构（2025年）</div>
+    
+    <div class="bar-chart">
+      <div class="bar-item">
+        <div class="bar-label" data-t="出口：2.27万亿元 (79.9%)|Export: 2.27 trillion (79.9%)">出口：2.27万亿元 (79.9%)</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:80%;">79.9%</div>
+        </div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label" data-t="进口：5702亿元 (20.1%)|Import: 570.2 billion (20.1%)">进口：5702亿元 (20.1%)</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:20%;">20.1%</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="insight-box">
+      <strong data-t="关键发现：|Key Findings:">关键发现：</strong>
+      <span data-t="跨境电商出口占比接近80%，是绝对主导；2024年跨境电商增速（14%）远高于2025年（4.8%），说明市场逐渐成熟；2025年跨境电商占出口总值8.4%，已成为重要出口渠道。|CBEC export accounts for nearly 80%, being the absolute dominant force. The CBEC growth rate in 2024 (14%) was much higher than in 2025 (4.8%), indicating the market is gradually maturing. In 2025, CBEC accounted for 8.4% of total export value, becoming an important export channel.">跨境电商出口占比接近80%，是绝对主导；2024年跨境电商增速（14%）远高于2025年（4.8%），说明市场逐渐成熟；2025年跨境电商占出口总值8.4%，已成为重要出口渠道。</span>
+    </div>
+  </div>
+
+  <!-- 三、热门出口商品分析 -->
+  <div class="section">
+    <div class="section-title">三、热门出口商品分析</div>
+    
+    <div class="section-subtitle" data-t="3.1 2024年中国出口TOP10产品|3.1 China's Top 10 Export Products (2024)">3.1 2024年中国出口TOP10产品</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="排名|Rank">排名</th>
+          <th data-t="产品名称|Product">产品名称</th>
+          <th data-t="HS编码|HS Code">HS编码</th>
+          <th data-t="出口额（亿美元）|Export Value (100M USD)">出口额（亿美元）</th>
+          <th data-t="占TOP100比重|Share of TOP100">占TOP100比重</th>
+          <th data-t="同比增长|YoY Growth">同比增长</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><strong data-t="智能手机|Smartphones">智能手机</strong></td>
+          <td>851713</td>
+          <td>1,330</td>
+          <td>11.2%</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td data-t="便携式电脑|Laptops">便携式电脑</td>
+          <td>847130</td>
+          <td>1,021</td>
+          <td>8.6%</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td data-t="低值简易通关产品*|Low-value Express Products*">低值简易通关产品*</td>
+          <td>980400</td>
+          <td>896</td>
+          <td>7.5%</td>
+          <td style="color:#4caf50;font-weight:600;">+28.1%</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td data-t="锂电池|Lithium Batteries">锂电池</td>
+          <td>850760</td>
+          <td>611</td>
+          <td>5.1%</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td data-t="新能源汽车|New Energy Vehicles">新能源汽车</td>
+          <td>870380</td>
+          <td>319</td>
+          <td>2.7%</td>
+          <td style="color:#4caf50;font-weight:600;">+37.2%</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td data-t="太阳能电池|Solar Cells">太阳能电池</td>
+          <td>854143</td>
+          <td>280</td>
+          <td>2.4%</td>
+          <td>-</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div style="font-size:12px;color:#888;margin-top:8px;" data-t="*低值简易通关产品：主要是跨境电商小额包裹|*Low-value express products: mainly CBEC small parcels">*低值简易通关产品：主要是跨境电商小额包裹</div>
+    
+    <div class="section-subtitle" data-t="3.2 增长最快的产品类别（2024年）|3.2 Fastest Growing Product Categories (2024)">3.2 增长最快的产品类别（2024年）</div>
+    
+    <div class="data-cards">
+      <div class="data-card">
+        <div class="value" style="color:#4caf50;">+281.7</div>
+        <div class="label" data-t="低值简易通关产品（亿美元）|Low-value Express Products (100M USD)">低值简易通关产品（亿美元）</div>
+        <div class="change up" data-t="跨境电商综试区扩至165城|CBEC Pilot Zones expanded to 165 cities">跨境电商综试区扩至165城</div>
+      </div>
+      <div class="data-card">
+        <div class="value" style="color:#4caf50;">+137.3</div>
+        <div class="label" data-t="船舶（LNG船、汽车滚装船）（亿美元）|Ships (LNG, Ro-Ro) (100M USD)">船舶（LNG船、汽车滚装船）（亿美元）</div>
+        <div class="change up" data-t="全球订单占比60%|Global orders 60% share">全球订单占比60%</div>
+      </div>
+      <div class="data-card">
+        <div class="value" style="color:#4caf50;">+196</div>
+        <div class="label" data-t="集成电路（存储器/处理器）（亿美元）|Integrated Circuits (Memory/Processor) (100M USD)">集成电路（存储器/处理器）（亿美元）</div>
+        <div class="change up" data-t="国产28nm芯片量产|Domestic 28nm chips mass production">国产28nm芯片量产</div>
+      </div>
+    </div>
+    
+    <div class="section-subtitle" data-t="3.3 跨境电商出口商品品类结构（2024年）|3.3 CBEC Export Product Category Structure (2024)">3.3 跨境电商出口商品品类结构（2024年）</div>
+    
+    <div class="bar-chart">
+      <div class="bar-item">
+        <div class="bar-label" data-t="服饰鞋包首饰 27.3%|Clothing, Shoes, Bags, Jewelry 27.3%">服饰鞋包首饰 27.3%</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:55%;">27.3%</div>
+        </div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label" data-t="手机等电子产品 14.4%|Phones & Electronics 14.4%">手机等电子产品 14.4%</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:29%;">14.4%</div>
+        </div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label" data-t="家居家纺用品 12.4%|Home & Textiles 12.4%">家居家纺用品 12.4%</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:25%;">12.4%</div>
+        </div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label" data-t="其他 45.9%|Others 45.9%">其他 45.9%</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:92%;">45.9%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 四、跨境电商进口商品分析 -->
+  <div class="section">
+    <div class="section-title">四、跨境电商进口商品分析（2025年）</div>
+    
+    <div class="section-subtitle" data-t="4.1 进口商品品类占比|4.1 Import Product Category Share">4.1 进口商品品类占比</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="品类|Category">品类</th>
+          <th data-t="占比|Share">占比</th>
+          <th data-t="变化趋势|Trend">变化趋势</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-t="美容化妆、香水及日化洗护|Cosmetics, Perfumes & Daily Chemicals">美容化妆、香水及日化洗护</td>
+          <td><strong style="color:#d4af37;">27.2%</strong></td>
+          <td style="color:#4caf50;" data-t="略升|Slightly up">略升</td>
+        </tr>
+        <tr>
+          <td data-t="食品生鲜|Food & Fresh Products">食品生鲜</td>
+          <td><strong style="color:#d4af37;">23.9%</strong></td>
+          <td style="color:#4caf50;" data-t="略升|Slightly up">略升</td>
+        </tr>
+        <tr>
+          <td data-t="医药保健品及医疗器具|Health Products & Medical Devices">医药保健品及医疗器具</td>
+          <td>13.7%</td>
+          <td style="color:#f44336;" data-t="下降1.7个百分点|Down 1.7pp">下降1.7个百分点</td>
+        </tr>
+        <tr>
+          <td data-t="服饰鞋包及珠宝配饰|Clothing, Shoes, Bags & Jewelry">服饰鞋包及珠宝配饰</td>
+          <td>9.9%</td>
+          <td style="color:#4caf50;" data-t="略升|Slightly up">略升</td>
+        </tr>
+        <tr>
+          <td data-t="手机电脑等数码产品及配件|Phones, Computers & Accessories">手机电脑等数码产品及配件</td>
+          <td>5.0%</td>
+          <td style="color:#4caf50;" data-t="略升|Slightly up">略升</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="insight-box">
+      <strong data-t="洞察：|Insight:">洞察：</strong>
+      <span data-t="美妆和食品仍是跨境电商进口的绝对主力，合计超过50%。|Cosmetics and food remain the absolute main force of CBEC imports, together accounting for over 50%.">美妆和食品仍是跨境电商进口的绝对主力，合计超过50%。</span>
+    </div>
+  </div>
+
+  <!-- 五、主要贸易伙伴分析 -->
+  <div class="section">
+    <div class="section-title">五、主要贸易伙伴分析</div>
+    
+    <div class="section-subtitle" data-t="5.1 跨境电商主要出口目的地（2025年）|5.1 Major CBEC Export Destinations (2025)">5.1 跨境电商主要出口目的地（2025年）</div>
+    
+    <div class="insight-box">
+      <span data-t="根据海关总署数据：<br>• <strong>美国、英国、德国</strong>是主要目的国<br>• 新兴市场（越南、巴西等）贡献超过40%的出口增量|According to GACC data:<br>• <strong>US, UK, Germany</strong> are the major destination countries<br>• Emerging markets (Vietnam, Brazil, etc.) contributed over 40% of export increment">根据海关总署数据：<br>• <strong>美国、英国、德国</strong>是主要目的国<br>• 新兴市场（越南、巴西等）贡献超过40%的出口增量</span>
+    </div>
+    
+    <div class="section-subtitle" data-t="5.2 一带一路国家贸易数据（2025年）|5.2 Belt and Road Countries Trade Data (2025)">5.2 一带一路国家贸易数据（2025年）</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="指标|Indicator">指标</th>
+          <th data-t="金额（亿元）|Value (100M CNY)">金额（亿元）</th>
+          <th data-t="同比增长|YoY Growth">同比增长</th>
+          <th data-t="占外贸总值比重|Share of Total Trade">占外贸总值比重</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-t="进出口总额|Total Import/Export">进出口总额</td>
+          <td>236,018</td>
+          <td style="color:#4caf50;font-weight:600;">+6.3%</td>
+          <td>51.9%</td>
+        </tr>
+        <tr>
+          <td data-t="出口|Export">出口</td>
+          <td>136,851</td>
+          <td style="color:#4caf50;font-weight:600;">+11.2%</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td data-t="进口|Import">进口</td>
+          <td>99,167</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="insight-box">
+      <strong data-t="结论：|Conclusion:">结论：</strong>
+      <span data-t="一带一路国家已成为中国外贸的"半壁江山"。|Belt and Road countries have become "half of China's foreign trade".">一带一路国家已成为中国外贸的"半壁江山"。</span>
+    </div>
+  </div>
+
+  <!-- 六、区域分布分析 -->
+  <div class="section">
+    <div class="section-title">六、区域分布分析</div>
+    
+    <div class="section-subtitle" data-t="6.1 跨境电商出口货源地（2025年）|6.1 CBEC Export Source Locations (2025)">6.1 跨境电商出口货源地（2025年）</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="城市|City">城市</th>
+          <th data-t="优势品类|Advantage Categories">优势品类</th>
+          <th data-t="备注|Notes">备注</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong data-t="深圳|Shenzhen">深圳</strong></td>
+          <td data-t="电子产品、3C|Electronics, 3C">电子产品、3C</td>
+          <td data-t="全国最大跨境电商口岸|Largest CBEC port in China">全国最大跨境电商口岸</td>
+        </tr>
+        <tr>
+          <td><strong data-t="义乌|Yiwu">义乌</strong></td>
+          <td data-t="小商品、服饰|Small commodities, Clothing">小商品、服饰</td>
+          <td data-t="全球小商品集散地|Global small commodity distribution center">全球小商品集散地</td>
+        </tr>
+        <tr>
+          <td><strong data-t="广州|Guangzhou">广州</strong></td>
+          <td data-t="服装、家居|Clothing, Home goods">服装、家居</td>
+          <td data-t="传统外贸强市|Traditional foreign trade strong city">传统外贸强市</td>
+        </tr>
+        <tr>
+          <td><strong data-t="杭州|Hangzhou">杭州</strong></td>
+          <td data-t="服装、日用品|Clothing, Daily goods">服装、日用品</td>
+          <td data-t="阿里巴巴总部所在地|Alibaba HQ location">阿里巴巴总部所在地</td>
+        </tr>
+        <tr>
+          <td><strong data-t="宁波|Ningbo">宁波</strong></td>
+          <td data-t="家居、汽配|Home goods, Auto parts">家居、汽配</td>
+          <td data-t="港口优势明显|Strong port advantage">港口优势明显</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="insight-box">
+      <strong data-t="关键发现：|Key Findings:">关键发现：</strong>
+      <span data-t="广东是跨境电商出口的最大货源地；东南沿海省市（广东、浙江、福建、江苏）高度集中；中西部地区发力起势，进出口年均增长7.9%。|Guangdong is the largest source of CBEC exports. Southeast coastal provinces (Guangdong, Zhejiang, Fujian, Jiangsu) are highly concentrated. Central and western regions are gaining momentum, with average annual import/export growth of 7.9%.">广东是跨境电商出口的最大货源地；东南沿海省市（广东、浙江、福建、江苏）高度集中；中西部地区发力起势，进出口年均增长7.9%。</span>
+    </div>
+  </div>
+
+  <!-- 七、HS编码参考清单 -->
+  <div class="section">
+    <div class="section-title">七、HS编码参考清单（跨境电商热门品类）</div>
+    
+    <div class="section-subtitle" data-t="7.1 电子产品类|7.1 Electronics Category">7.1 电子产品类</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="HS编码|HS Code">HS编码</th>
+          <th data-t="商品名称|Product Name">商品名称</th>
+          <th data-t="适用平台|Applicable Platforms">适用平台</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>851713</td><td data-t="智能手机|Smartphones">智能手机</td><td>Amazon、速卖通</td></tr>
+        <tr><td>847130</td><td data-t="便携式电脑（平板、笔记本）|Portable Computers (Tablets, Laptops)">便携式电脑（平板、笔记本）</td><td>Amazon、eBay</td></tr>
+        <tr><td>851762</td><td data-t="无线通信设备|Wireless Communication Devices">无线通信设备</td><td>-</td></tr>
+        <tr><td>854232</td><td data-t="集成电路（存储器）|Integrated Circuits (Memory)">集成电路（存储器）</td><td>-</td></tr>
+        <tr><td>854231</td><td data-t="集成电路（处理器）|Integrated Circuits (Processor)">集成电路（处理器）</td><td>-</td></tr>
+        <tr><td>850760</td><td data-t="锂电池|Lithium Batteries">锂电池</td><td>-</td></tr>
+        <tr><td>854143</td><td data-t="太阳能电池|Solar Cells">太阳能电池</td><td>-</td></tr>
+      </tbody>
+    </table>
+    
+    <div class="section-subtitle" data-t="7.2 服饰家居类|7.2 Clothing & Home Category">7.2 服饰家居类</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="HS编码|HS Code">HS编码</th>
+          <th data-t="商品名称|Product Name">商品名称</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>4202</td><td data-t="箱包及类似容器|Bags & Similar Containers">箱包及类似容器</td></tr>
+        <tr><td>61-62章</td><td data-t="服装及衣着附件|Clothing & Accessories">服装及衣着附件</td></tr>
+        <tr><td>9403</td><td data-t="家具（床、桌、椅等）|Furniture (Beds, Tables, Chairs, etc.)">家具（床、桌、椅等）</td></tr>
+        <tr><td>9405</td><td data-t="灯具及照明装置|Lighting & Lamps">灯具及照明装置</td></tr>
+        <tr><td>6302</td><td data-t="床上用品（被褥、床单等）|Bedding (Quilts, Bed Sheets, etc.)">床上用品（被褥、床单等）</td></tr>
+      </tbody>
+    </table>
+    
+    <div class="section-subtitle" data-t="7.3 新能源汽车及相关|7.3 New Energy Vehicles & Related">7.3 新能源汽车及相关</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="HS编码|HS Code">HS编码</th>
+          <th data-t="商品名称|Product Name">商品名称</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>870380</td><td data-t="新能源汽车（电动）|New Energy Vehicles (Electric)">新能源汽车（电动）</td></tr>
+        <tr><td>870340</td><td data-t="混合动力汽车|Hybrid Vehicles">混合动力汽车</td></tr>
+        <tr><td>850760</td><td data-t="动力电池|Power Batteries">动力电池</td></tr>
+        <tr><td>851220</td><td data-t="汽车照明及信号装置|Automotive Lighting & Signal Devices">汽车照明及信号装置</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 八、趋势洞察与建议 -->
+  <div class="section">
+    <div class="section-title">八、跨境电商趋势洞察与建议</div>
+    
+    <div class="section-subtitle" data-t="8.1 核心趋势|8.1 Core Trends">8.1 核心趋势</div>
+    
+    <ul class="bullet-list">
+      <li data-t="「新三样」持续火爆：新能源汽车、锂电池、太阳能电池出口高速增长；2024年「新三样」出口比2020年增长2.6倍|"New Three" continue to boom: NEV, lithium batteries, solar cells export growing rapidly; 2024 "New Three" export 2.6x of 2020 level">「新三样」持续火爆：新能源汽车、锂电池、太阳能电池出口高速增长；2024年「新三样」出口比2020年增长2.6倍</li>
+      <li data-t="跨境电商「小单快反」模式崛起：低值简易通关产品（HS 980400）同比增长28.1%；适合服饰、家居、3C配件等快消品|CBEC "small order fast reaction" model rising: low-value express products (HS 980400) YoY +28.1%; suitable for clothing, home, 3C accessories">跨境电商「小单快反」模式崛起：低值简易通关产品（HS 980400）同比增长28.1%；适合服饰、家居、3C配件等快消品</li>
+      <li data-t="新兴市场成为增长引擎：越南、巴西等市场贡献超40%出口增量；一带一路国家进出口增长6.3%，高于整体增速|Emerging markets become growth engine: Vietnam, Brazil and other markets contributed over 40% export increment; B&R countries import/export growth 6.3%, higher than overall">新兴市场成为增长引擎：越南、巴西等市场贡献超40%出口增量；一带一路国家进出口增长6.3%，高于整体增速</li>
+      <li data-t="B2B跨境电商需求高速增长：工具设备占B2B出口27.6%；纺织品17.2%、家居用品13.2%|B2B CBEC demand growing rapidly: tools & equipment account for 27.6% of B2B export; textiles 17.2%, home goods 13.2%">B2B跨境电商需求高速增长：工具设备占B2B出口27.6%；纺织品17.2%、家居用品13.2%</li>
+    </ul>
+    
+    <div class="section-subtitle" data-t="8.2 选品建议|8.2 Product Selection Recommendations">8.2 选品建议</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="潜力等级|Potential Level">潜力等级</th>
+          <th data-t="产品类别|Product Category">产品类别</th>
+          <th data-t="理由|Reason">理由</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:rgba(76,175,80,0.08);">
+          <td style="color:#4caf50;font-weight:700;" data-t="高潜力|High Potential">高潜力</td>
+          <td data-t="新能源汽车及配件|NEV & Accessories">新能源汽车及配件</td>
+          <td data-t="增长37.2%，政策支持|Growth 37.2%, policy support">增长37.2%，政策支持</td>
+        </tr>
+        <tr style="background:rgba(76,175,80,0.08);">
+          <td style="color:#4caf50;font-weight:700;" data-t="高潜力|High Potential">高潜力</td>
+          <td data-t="智能家居设备|Smart Home Devices">智能家居设备</td>
+          <td data-t="市场预计增长36.2%|Market expected growth 36.2%">市场预计增长36.2%</td>
+        </tr>
+        <tr style="background:rgba(76,175,80,0.08);">
+          <td style="color:#4caf50;font-weight:700;" data-t="高潜力|High Potential">高潜力</td>
+          <td data-t="健康个护产品|Health & Personal Care">健康个护产品</td>
+          <td data-t="增长迅速|Rapid growth">增长迅速</td>
+        </tr>
+        <tr style="background:rgba(76,175,80,0.08);">
+          <td style="color:#4caf50;font-weight:700;" data-t="高潜力|High Potential">高潜力</td>
+          <td data-t="户外用品|Outdoor Products">户外用品</td>
+          <td data-t="占B2B出口8.9%|Account for 8.9% of B2B export">占B2B出口8.9%</td>
+        </tr>
+        <tr>
+          <td style="color:#ff9800;font-weight:700;" data-t="中等竞争|Medium Competition">中等竞争</td>
+          <td data-t="智能手机|Smartphones">智能手机</td>
+          <td data-t="竞争激烈，头部效应明显|Fierce competition, strong head effect">竞争激烈，头部效应明显</td>
+        </tr>
+        <tr>
+          <td style="color:#ff9800;font-weight:700;" data-t="中等竞争|Medium Competition">中等竞争</td>
+          <td data-t="服装鞋包|Clothing, Shoes, Bags">服装鞋包</td>
+          <td data-t="占比27.3%，但利润较低|Share 27.3%, but low profit">占比27.3%，但利润较低</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="section-subtitle" data-t="8.3 目标市场建议|8.3 Target Market Recommendations">8.3 目标市场建议</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="市场|Market">市场</th>
+          <th data-t="推荐品类|Recommended Categories">推荐品类</th>
+          <th data-t="进入难度|Entry Difficulty">进入难度</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td data-t="美国|United States">美国</td><td data-t="电子产品、家居、服装|Electronics, Home, Clothing">电子产品、家居、服装</td><td data-t="中等（关税风险）|Medium (Tariff risk)">中等（关税风险）</td></tr>
+        <tr><td data-t="欧洲|Europe">欧洲</td><td data-t="新能源汽车、光伏、美妆|NEV, Solar, Cosmetics">新能源汽车、光伏、美妆</td><td data-t="较高（合规要求）|High (Compliance requirements)">较高（合规要求）</td></tr>
+        <tr><td data-t="东南亚|Southeast Asia">东南亚</td><td data-t="电子配件、家居、服饰|Electronic Accessories, Home, Clothing">电子配件、家居、服饰</td><td data-t="低|Low">低</td></tr>
+        <tr><td data-t="中东|Middle East">中东</td><td data-t="3C电子、家居、汽配|3C Electronics, Home, Auto Parts">3C电子、家居、汽配</td><td data-t="低-中等|Low-Medium">低-中等</td></tr>
+        <tr><td data-t="拉美|Latin America">拉美</td><td data-t="电子产品、工具设备|Electronics, Tools & Equipment">电子产品、工具设备</td><td data-t="中等|Medium">中等</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 九、数据获取指引 -->
+  <div class="section">
+    <div class="section-title">九、2026年数据获取指引</div>
+    
+    <div class="section-subtitle" data-t="9.1 官方数据查询平台|9.1 Official Data Query Platform">9.1 官方数据查询平台</div>
+    
+    <div class="insight-box">
+      <strong data-t="海关统计数据在线查询平台：|Customs Statistics Online Query Platform:">海关统计数据在线查询平台：</strong><br>
+      <span data-t="• 网址：<a href="http://stats.customs.gov.cn" style="color:#d4af37;" target="_blank">http://stats.customs.gov.cn</a><br>• 功能：支持按商品、贸易伙伴、贸易方式、收发货人注册地4个维度组合查询<br>• 限制：每次最多500个HS编码，邮件发送限制50MB|• URL: <a href="http://stats.customs.gov.cn" style="color:#d4af37;" target="_blank">http://stats.customs.gov.cn</a><br>• Function: Supports combined query by product, trade partner, trade method, consignee/shipper registration location (4 dimensions)<br>• Limitation: Max 500 HS codes per query, email delivery limit 50MB">• 网址：<a href="http://stats.customs.gov.cn" style="color:#d4af37;" target="_blank">http://stats.customs.gov.cn</a><br>• 功能：支持按商品、贸易伙伴、贸易方式、收发货人注册地4个维度组合查询<br>• 限制：每次最多500个HS编码，邮件发送限制50MB</span>
+    </div>
+    
+    <div class="section-subtitle" data-t="9.2 2026年数据公布时间表|9.2 2026 Data Release Schedule">9.2 2026年数据公布时间表</div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-t="公布时间|Release Time">公布时间</th>
+          <th data-t="内容|Content">内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td data-t="每月10日左右|Around the 10th of each month">每月10日左右</td><td data-t="上月快讯数据|Previous month quick data">上月快讯数据</td></tr>
+        <tr><td data-t="每月18日左右|Around the 18th of each month">每月18日左右</td><td data-t="上月月刊数据|Previous month monthly data">上月月刊数据</td></tr>
+        <tr><td data-t="每月20日左右|Around the 20th of each month">每月20日左右</td><td data-t="在线查询数据开放|Online query data open">在线查询数据开放</td></tr>
+        <tr><td data-t="每年7月起|From July each year">每年7月起</td><td data-t="上年度数据不再更正|Previous year data no longer corrected">上年度数据不再更正</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 页脚 -->
+  <div class="report-footer">
+    <p data-t="本报告由 AI 根据公开数据整理生成，供跨境电商选品和市场研究参考使用。|This report is generated by AI based on public data, for CBEC product selection and market research reference.">本报告由 AI 根据公开数据整理生成，供跨境电商选品和市场研究参考使用。</p>
+    <p style="margin-top:8px;" data-t="数据来源：中华人民共和国海关总署、国家统计局、商务部|Data Source: General Administration of Customs, National Bureau of Statistics, Ministry of Commerce">数据来源：中华人民共和国海关总署、国家统计局、商务部</p>
+    <p style="margin-top:16px;font-size:12px;" data-t="© 2026 跨境电商数据报告 | 最后更新：2026年6月20日|© 2026 CBEC Data Report | Last Updated: June 20, 2026">© 2026 跨境电商数据报告 | 最后更新：2026年6月20日</p>
+  </div>
+
+</div>
+
+<script>
+// 双语切换
+let currentLang = 'zh';
+
+const translations = {
+  'zh': {},
+  'en': {}
+};
+
+function toggleLang() {
+  currentLang = currentLang === 'zh' ? 'en' : 'zh';
+  document.getElementById('langBtnText').textContent = currentLang === 'zh' ? 'EN' : '中文';
+  
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const text = el.getAttribute('data-t');
+    if (text) {
+      const parts = text.split('|');
+      if (parts.length >= 2) {
+        el.innerHTML = currentLang === 'zh' ? parts[0] : (parts[1] || parts[0]);
+      }
+    }
+  });
+  
+  document.documentElement.lang = currentLang === 'zh' ? 'zh' : 'en';
+}
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Report page loaded');
+});
+</script>
+
+</body>
+</html>
