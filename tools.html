@@ -11,12 +11,10 @@
   <div class="lang-loading">加载中...</div>
 
   <script>
-    // 语言辅助函数：zh=中文, en=英文, ar=阿拉伯语
-    function t(zh, en, ar) {
+    // 语言辅助函数：zh=中文, en=英文
+    function t(zh, en) {
       const lang = localStorage.getItem('lang') || 'zh';
-      if (lang === 'ar') return ar;
-      if (lang === 'en') return en;
-      return zh;
+      return lang === 'en' ? en : zh;
     }
 
     // 立即读取 config 注入页面
@@ -36,11 +34,9 @@
 
     function renderToolsPage(config, products) {
       const lang = localStorage.getItem('lang') || 'zh';
-      const dir = lang === 'ar' ? 'rtl' : 'ltr';
-
-      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
-      document.documentElement.dir = dir;
-      document.title = t(config.site.name_zh, config.site.name_en, config.site.name_zh) + t(' - 跨境工具', ' - Cross-Border Tools', ' - أدوات التجارة العابرة للحدود');
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      document.documentElement.dir = 'ltr';
+      document.title = t(config.site.name_zh, config.site.name_en) + t(' - 跨境工具', ' - Cross-Border Tools');
 
       // Facebook Pixel
       if (config.facebook.pixel_id) {
@@ -55,112 +51,97 @@
           icon: '📦',
           title_zh: '选品工具',
           title_en: 'Product Selection',
-          title_ar: 'اختيار المنتج',
           desc_zh: '分析市场趋势，帮你找到跨境爆品。',
           desc_en: 'Analyze market trends and find winning products for your cross-border business.',
-          desc_ar: 'تحليل اتجاهات السوق والعثور على المنتجات الرابحة لعملك التجاري العابر للحدود.',
           features_zh: ['趋势分析', '利润计算', '竞品洞察'],
-          features_en: ['Trend Analysis', 'Profit Calculator', 'Competitor Insights'],
-          features_ar: ['تحليل الاتجاهات', 'حاسبة الأرباح', 'رؤى المنافسين']
+          features_en: ['Trend Analysis', 'Profit Calculator', 'Competitor Insights']
         },
         {
           id: 'competitor-analysis',
           icon: '📊',
           title_zh: '竞品分析',
           title_en: 'Competitor Analysis',
-          title_ar: 'تحليل المنافسين',
           desc_zh: '实时监控竞品价格、评价和销售策略。',
           desc_en: 'Monitor competitor pricing, reviews, and sales strategies in real-time.',
-          desc_ar: 'راقب تسعير المنافسين والمراجعات واستراتيجيات المبيعات في الوقت الفعلي.',
           features_zh: ['价格追踪', '评价分析', '销量估算'],
-          features_en: ['Price Tracking', 'Review Analysis', 'Sales Estimation'],
-          features_ar: ['تتبع السعر', 'تحليل المراجعات', 'تقدير المبيعات']
+          features_en: ['Price Tracking', 'Review Analysis', 'Sales Estimation']
         },
         {
           id: 'multi-platform',
           icon: '🌐',
           title_zh: '多平台管理',
           title_en: 'Multi-Platform Manager',
-          title_ar: 'مدير متعدد المنصات',
           desc_zh: '一站式管理所有跨境电商店铺，自动同步库存。',
           desc_en: 'Manage all your cross-border stores from one dashboard. Sync inventory automatically.',
-          desc_ar: 'أدر جميع متاجرك العابرة للحدود من لوحة تحكم واحدة. مزامنة المخزون تلقائياً.',
           features_zh: ['Amazon', 'Shopee', 'Lazada', 'eBay'],
-          features_en: ['Amazon', 'Shopee', 'Lazada', 'eBay'],
-          features_ar: ['أمازون', 'شوبي', 'لازادا', 'إيبي']
+          features_en: ['Amazon', 'Shopee', 'Lazada', 'eBay']
         },
         {
           id: 'data-analysis',
           icon: '📈',
           title_zh: '数据分析',
           title_en: 'Data Analytics',
-          title_ar: 'تحليلات البيانات',
           desc_zh: '可视化销售数据，交互式图表，支持导出报告。',
           desc_en: 'Visualize your sales performance with interactive charts and export reports.',
-          desc_ar: 'تصور أداء مبيعاتك مع المخططات التفاعلية وتصدير التقارير.',
           features_zh: ['销售趋势', '利润报告', '地区分析'],
-          features_en: ['Sales Trends', 'Profit Reports', 'Regional Analysis'],
-          features_ar: ['اتجاهات المبيعات', 'تقارير الأرباح', 'التحليل الإقليمي']
+          features_en: ['Sales Trends', 'Profit Reports', 'Regional Analysis']
         },
         {
           id: 'automation',
           icon: '🤖',
           title_zh: '自动化工具',
           title_en: 'Automation Tools',
-          title_ar: 'أدوات الأتمتة',
           desc_zh: '自动回复、订单处理、客户跟进，帮你节省时间。',
           desc_en: 'Automate replies, order processing, and customer follow-ups to save time.',
-          desc_ar: 'أتمتة الردود ومعالجة الطلبات ومتابعة العملاء لتوفير الوقت.',
           features_zh: ['自动回复', '订单同步', '评价邀请'],
-          features_en: ['Auto-Reply', 'Order Sync', 'Review Requests'],
-          features_ar: ['الرد التلقائي', 'مزامنة الطلبات', 'طلبات المراجعة']
+          features_en: ['Auto-Reply', 'Order Sync', 'Review Requests']
         }
       ];
 
       const toolCardHTML = (tool) => `
         <div class="tool-card" data-id="${tool.id}" onclick="openTool('${tool.id}')">
           <div class="tool-icon">${tool.icon}</div>
-          <h3>${t(tool.title_zh, tool.title_en, tool.title_ar)}</h3>
-          <p>${t(tool.desc_zh, tool.desc_en, tool.desc_ar)}</p>
+          <h3>${t(tool.title_zh, tool.title_en)}</h3>
+          <p>${t(tool.desc_zh, tool.desc_en)}</p>
           <div class="tool-features">
-            ${t(tool.features_zh, tool.features_en, tool.features_ar).map(f => `<span class="feature-tag">${f}</span>`).join('')}
+            ${t(tool.features_zh, tool.features_en).map(f => `<span class="feature-tag">${f}</span>`).join('')}
           </div>
           <div class="tool-action">
-            <span class="btn-try">${t('立即试用', 'Try Now', 'جرب الآن')} →</span>
+            <span class="btn-try">${t('立即试用', 'Try Now')} →</span>
           </div>
         </div>
       `;
 
-      const langBtnText = lang === 'zh' ? 'EN' : (lang === 'en' ? 'العربية' : '中文');
+      const langBtnText = lang === 'zh' ? 'EN' : '中文';
 
       document.body.innerHTML = `
         <header class="topbar">
-          <div class="logo">${t(config.site.name_zh, config.site.name_en, config.site.name_zh)}</div>
+          <div class="logo">${t(config.site.name_zh, config.site.name_en)}</div>
           <nav class="topbar-nav">
-            <a href="index.html" class="nav-link">${t('视频', 'Videos', 'الفيديوهات')}</a>
-            <a href="tools.html" class="nav-link active">${t('工具', 'Tools', 'الأدوات')}</a>
+            <a href="index.html" class="nav-link">${t('视频', 'Videos')}</a>
+            <a href="tools.html" class="nav-link">${t('工具', 'Tools')}</a>
           </nav>
           <div class="topbar-actions">
             <button class="lang-toggle" onclick="toggleLang()">${langBtnText}</button>
             <a class="wa-top" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
-              ${t('WhatsApp', 'WhatsApp', 'واتساب')}
+              WhatsApp
             </a>
           </div>
         </header>
 
         <section class="hero-tools">
-          <h1>${t('跨境电商卖家工具', 'Cross-Border Seller Tools', 'أدوات بائع التجارة العابرة للحدود')}</h1>
-          <p>${t('专业工具助你跨境出海成功，所有工具均可免费试用！', 'Professional tools to help you succeed in cross-border e-commerce. All tools are free to try!', 'أدوات احترافية لمساعدتك في النجاح في التجارة الإلكترونية العابرة للحدود. جميع الأدوات مجانية للتجربة!')}</p>
+          <h1>${t('跨境电商卖家工具', 'Cross-Border Seller Tools')}</h1>
+          <p>${t('专业工具助你跨境出海成功，所有工具均可免费试用！', 'Professional tools to help you succeed in cross-border e-commerce. All tools are free to try!')}</p>
           <div class="hero-stats">
-            <div><strong>5+</strong><span>${t('专业工具', 'Pro Tools', 'أدوات احترافية')}</span></div>
-            <div><strong>100%</strong><span>${t('免费试用', 'Free Trial', 'تجربة مجانية')}</span></div>
-            <div><strong>24/7</strong><span>${t('在线可用', 'Online', 'متوافر عبر الإنترنت')}</span></div>
+            <div><strong>5+</strong><span>${t('专业工具', 'Pro Tools')}</span></div>
+            <div><strong>100%</strong><span>${t('免费试用', 'Free Trial')}</span></div>
+            <div><strong>24/7</strong><span>${t('在线可用', 'Online')}</span></div>
           </div>
         </section>
 
         <section class="section">
-          <h2 class="section-title">${t('全部工具', 'All Tools', 'جميع الأدوات')}</h2>
+          <h2 class="section-title">${t('全部工具', 'All Tools')}</h2>
           <div class="tools-grid" id="tools-grid">
             ${toolCards.map(toolCardHTML).join('')}
           </div>
@@ -174,18 +155,18 @@
         </div>
 
         <section class="cta-section">
-          <h2>${t('需要定制工具？', 'Need Custom Tools?', 'تحتاج أدوات مخصصة؟')}</h2>
-          <p>${t('联系我们的 WhatsApp，获取定制工具开发和批量价格。', 'Contact us on WhatsApp for custom tool development and bulk pricing.', 'تواصل معنا عبر واتساب لتطوير أدوات مخصصة وأسعار الجملة.')}</p>
-          <a class="btn-cta" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我需要定制跨境工具', 'Hi, I need custom cross-border tools', 'مرحباً، أحتاج أدوات تجارة عابرة للحدود مخصصة'))}">
-            ${t('WhatsApp 联系我们', 'Contact on WhatsApp', 'تواصل عبر واتساب')}
+          <h2>${t('需要定制工具？', 'Need Custom Tools?')}</h2>
+          <p>${t('联系我们的 WhatsApp，获取定制工具开发和批量价格。', 'Contact us on WhatsApp for custom tool development and bulk pricing.')}</p>
+          <a class="btn-cta" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我需要定制跨境工具', 'Hi, I need custom cross-border tools'))}">
+            ${t('WhatsApp 联系我们', 'Contact on WhatsApp')}
           </a>
         </section>
 
         <footer>
-          <p>© ${new Date().getFullYear()} ${t(config.site.name_zh, config.site.name_en, config.site.name_zh)}. ${t('保留所有权利。', 'All rights reserved.', 'جميع الحقوق محفوظة.')}</p>
+          <p>&copy; ${new Date().getFullYear()} ${t(config.site.name_zh, config.site.name_en)}. ${t('保留所有权利。', 'All rights reserved.')}</p>
         </footer>
 
-        <a class="wa-float" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我对你们的工具感兴趣', 'Hi, I am interested in your tools', 'مرحباً، أنا مهتم بأدواتكم'))}" onclick="trackContact()" aria-label="WhatsApp">
+        <a class="wa-float" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我对你们的工具感兴趣', 'Hi, I am interested in your tools'))}" onclick="trackContact()" aria-label="WhatsApp">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
         </a>
       `;
@@ -193,8 +174,7 @@
 
     function toggleLang() {
       const cur = localStorage.getItem('lang') || 'zh';
-      // 循环切换：中文 → 英文 → 阿拉伯语 → 中文
-      const next = cur === 'zh' ? 'en' : (cur === 'en' ? 'ar' : 'zh');
+      const next = cur === 'zh' ? 'en' : 'zh';
       localStorage.setItem('lang', next);
       location.reload();
     }
@@ -206,21 +186,20 @@
         'product-selection': {
           title_zh: '选品工具',
           title_en: 'Product Selection Tool',
-          title_ar: 'أداة اختيار المنتج',
           content: `
-            <h2>${t('选品工具', 'Product Selection Tool', 'أداة اختيار المنتج')}</h2>
+            <h2>${t('选品工具', 'Product Selection Tool')}</h2>
             <div class="tool-form">
               <div class="form-group">
-                <label>${t('商品类目', 'Product Category', 'فئة المنتج')}</label>
+                <label>${t('商品类目', 'Product Category')}</label>
                 <select>
-                  <option>${t('电子产品', 'Electronics', 'إلكترونيات')}</option>
-                  <option>${t('时尚服饰', 'Fashion', 'أزياء')}</option>
-                  <option>${t('家居园艺', 'Home & Garden', 'منزل وحديقة')}</option>
-                  <option>${t('美妆健康', 'Beauty & Health', 'جمال وصحة')}</option>
+                  <option>${t('电子产品', 'Electronics')}</option>
+                  <option>${t('时尚服饰', 'Fashion')}</option>
+                  <option>${t('家居园艺', 'Home & Garden')}</option>
+                  <option>${t('美妆健康', 'Beauty & Health')}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>${t('目标市场', 'Target Market', 'السوق المستهدف')}</label>
+                <label>${t('目标市场', 'Target Market')}</label>
                 <select>
                   <option>USA</option>
                   <option>UAE</option>
@@ -229,10 +208,10 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>${t('价格区间（美元）', 'Price Range (USD)', 'نطاق السعر (دولار)')}</label>
+                <label>${t('价格区间（美元）', 'Price Range (USD)')}</label>
                 <input type="range" min="0" max="1000" value="100">
               </div>
-              <button class="btn-cta" onclick="showToolResult('product-selection')">${t('开始分析', 'Analyze', 'تحليل')}</button>
+              <button class="btn-cta" onclick="showToolResult('product-selection')">${t('开始分析', 'Analyze')}</button>
             </div>
             <div id="tool-result"></div>
           `
@@ -240,16 +219,15 @@
         'competitor-analysis': {
           title_zh: '竞品分析',
           title_en: 'Competitor Analysis Tool',
-          title_ar: 'أداة تحليل المنافسين',
           content: `
-            <h2>${t('竞品分析工具', 'Competitor Analysis Tool', 'أداة تحليل المنافسين')}</h2>
+            <h2>${t('竞品分析工具', 'Competitor Analysis Tool')}</h2>
             <div class="tool-form">
               <div class="form-group">
-                <label>${t('竞品店铺链接', 'Competitor Store URL', 'رابط متجر المنافس')}</label>
+                <label>${t('竞品店铺链接', 'Competitor Store URL')}</label>
                 <input type="text" placeholder="https://...">
               </div>
               <div class="form-group">
-                <label>${t('平台', 'Platform', 'المنصة')}</label>
+                <label>${t('平台', 'Platform')}</label>
                 <select>
                   <option>Amazon</option>
                   <option>Shopee</option>
@@ -257,7 +235,7 @@
                   <option>eBay</option>
                 </select>
               </div>
-              <button class="btn-cta" onclick="showToolResult('competitor-analysis')">${t('开始分析', 'Analyze', 'تحليل')}</button>
+              <button class="btn-cta" onclick="showToolResult('competitor-analysis')">${t('开始分析', 'Analyze')}</button>
             </div>
             <div id="tool-result"></div>
           `
@@ -265,27 +243,26 @@
         'multi-platform': {
           title_zh: '多平台管理',
           title_en: 'Multi-Platform Manager',
-          title_ar: 'مدير متعدد المنصات',
           content: `
-            <h2>${t('多平台管理', 'Multi-Platform Manager', 'مدير متعدد المنصات')}</h2>
+            <h2>${t('多平台管理', 'Multi-Platform Manager')}</h2>
             <div class="tool-form">
-              <p style="color:var(--text-dim);margin-bottom:20px">${t('连接你的店铺，一站式管理。', 'Connect your stores to manage them from one place.', 'اربط متاجرك لإدارتها من مكان واحد.')}</p>
+              <p style="color:var(--text-dim);margin-bottom:20px">${t('连接你的店铺，一站式管理。', 'Connect your stores to manage them from one place.')}</p>
               <div class="platform-cards">
                 <div class="platform-card">
                   <h3>Amazon</h3>
-                  <button class="btn-connect">${t('连接', 'Connect', 'اربط')}</button>
+                  <button class="btn-connect">${t('连接', 'Connect')}</button>
                 </div>
                 <div class="platform-card">
                   <h3>Shopee</h3>
-                  <button class="btn-connect">${t('连接', 'Connect', 'اربط')}</button>
+                  <button class="btn-connect">${t('连接', 'Connect')}</button>
                 </div>
                 <div class="platform-card">
                   <h3>Lazada</h3>
-                  <button class="btn-connect">${t('连接', 'Connect', 'اربط')}</button>
+                  <button class="btn-connect">${t('连接', 'Connect')}</button>
                 </div>
                 <div class="platform-card">
                   <h3>eBay</h3>
-                  <button class="btn-connect">${t('连接', 'Connect', 'اربط')}</button>
+                  <button class="btn-connect">${t('连接', 'Connect')}</button>
                 </div>
               </div>
             </div>
@@ -294,23 +271,22 @@
         'data-analysis': {
           title_zh: '数据分析',
           title_en: 'Data Analytics Tool',
-          title_ar: 'أداة تحليل البيانات',
           content: `
-            <h2>${t('数据分析工具', 'Data Analytics Tool', 'أداة تحليل البيانات')}</h2>
+            <h2>${t('数据分析工具', 'Data Analytics Tool')}</h2>
             <div class="tool-form">
               <div class="form-group">
-                <label>${t('上传销售数据（CSV）', 'Upload Sales Data (CSV)', 'ارفع بيانات المبيعات (CSV)')}</label>
+                <label>${t('上传销售数据（CSV）', 'Upload Sales Data (CSV)')}</label>
                 <input type="file" accept=".csv">
               </div>
               <div class="form-group">
-                <label>${t('分析类型', 'Analysis Type', 'نوع التحليل')}</label>
+                <label>${t('分析类型', 'Analysis Type')}</label>
                 <select>
-                  <option>${t('销售趋势', 'Sales Trend', 'اتجاه المبيعات')}</option>
-                  <option>${t('利润分析', 'Profit Analysis', 'تحليل الأرباح')}</option>
-                  <option>${t('地区分布', 'Regional Distribution', 'التوزيع الإقليمي')}</option>
+                  <option>${t('销售趋势', 'Sales Trend')}</option>
+                  <option>${t('利润分析', 'Profit Analysis')}</option>
+                  <option>${t('地区分布', 'Regional Distribution')}</option>
                 </select>
               </div>
-              <button class="btn-cta" onclick="showToolResult('data-analysis')">${t('开始分析', 'Analyze', 'تحليل')}</button>
+              <button class="btn-cta" onclick="showToolResult('data-analysis')">${t('开始分析', 'Analyze')}</button>
             </div>
             <div id="tool-result"></div>
           `
@@ -318,25 +294,24 @@
         'automation': {
           title_zh: '自动化工具',
           title_en: 'Automation Tools',
-          title_ar: 'أدوات الأتمتة',
           content: `
-            <h2>${t('自动化工具', 'Automation Tools', 'أدوات الأتمتة')}</h2>
+            <h2>${t('自动化工具', 'Automation Tools')}</h2>
             <div class="tool-form">
               <div class="automation-options">
                 <div class="auto-option">
-                  <h3>${t('自动回复', 'Auto-Reply', 'الرد التلقائي')}</h3>
-                  <p>${t('根据关键词自动回复客户消息。', 'Automatically reply to customer messages based on keywords.', 'الرد تلقائياً على رسائل العملاء بناءً على الكلمات المفتاحية.')}</p>
-                  <button class="btn-connect">${t('设置', 'Setup', 'إعداد')}</button>
+                  <h3>${t('自动回复', 'Auto-Reply')}</h3>
+                  <p>${t('根据关键词自动回复客户消息。', 'Automatically reply to customer messages based on keywords.')}</p>
+                  <button class="btn-connect">${t('设置', 'Setup')}</button>
                 </div>
                 <div class="auto-option">
-                  <h3>${t('订单同步', 'Order Sync', 'مزامنة الطلبات')}</h3>
-                  <p>${t('将所有平台的订单同步到一个面板。', 'Sync orders from all platforms to one dashboard.', 'مزامنة الطلبات من جميع المنصات إلى لوحة تحكم واحدة.')}</p>
-                  <button class="btn-connect">${t('设置', 'Setup', 'إعداد')}</button>
+                  <h3>${t('订单同步', 'Order Sync')}</h3>
+                  <p>${t('将所有平台的订单同步到一个面板。', 'Sync orders from all platforms to one dashboard.')}</p>
+                  <button class="btn-connect">${t('设置', 'Setup')}</button>
                 </div>
                 <div class="auto-option">
-                  <h3>${t('评价邀请', 'Review Request', 'طلب مراجعة')}</h3>
-                  <p>${t('自动向客户发送评价邀请邮件。', 'Automatically send review request emails to customers.', 'إرسال رسائل طلب مراجعة للعملاء تلقائياً.')}</p>
-                  <button class="btn-connect">${t('设置', 'Setup', 'إعداد')}</button>
+                  <h3>${t('评价邀请', 'Review Request')}</h3>
+                  <p>${t('自动向客户发送评价邀请邮件。', 'Automatically send review request emails to customers.')}</p>
+                  <button class="btn-connect">${t('设置', 'Setup')}</button>
                 </div>
               </div>
             </div>
@@ -360,13 +335,13 @@
 
       document.getElementById('tool-result').innerHTML = `
         <div class="result-box">
-          <h3>${t('分析结果', 'Analysis Result', 'نتيجة التحليل')}</h3>
-          <p style="color:var(--text-dim)">${t('这是演示结果。联系我们的 WhatsApp 获取该工具的完整访问权限。', 'This is a demo result. Contact us on WhatsApp to get full access to this tool.', 'هذه نتيجة تجريبية. تواصل معنا عبر واتساب للحصول على الوصول الكامل لهذه الأدة.')}</p>
+          <h3>${t('分析结果', 'Analysis Result')}</h3>
+          <p style="color:var(--text-dim)">${t('这是演示结果。联系我们的 WhatsApp 获取该工具的完整访问权限。', 'This is a demo result. Contact us on WhatsApp to get full access to this tool.')}</p>
           <div style="margin-top:20px;padding:20px;background:var(--card);border-radius:8px;">
-            <p>📊 ${t('此处将显示数据可视化结果。', 'Sample data visualization would appear here.', 'عرض بيانات تجريبي سيظهر هنا.')}</p>
+            <p>📊 ${t('此处将显示数据可视化结果。', 'Sample data visualization would appear here.')}</p>
           </div>
           <a class="btn-cta" style="margin-top:20px;display:inline-block" target="_blank" href="#" onclick="trackLead()">
-            ${t('WhatsApp 获取完整权限', 'Get Full Access on WhatsApp', 'احصل على الوصول الكامل عبر واتساب')}
+            ${t('WhatsApp 获取完整权限', 'Get Full Access on WhatsApp')}
           </a>
         </div>
       `;

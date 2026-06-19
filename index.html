@@ -10,12 +10,10 @@
 <body>
   <div class="lang-loading">加载中...</div>
   <script>
-    // 语言辅助函数：zh=中文, en=英文, ar=阿拉伯语
-    function t(zh, en, ar) {
+    // 语言辅助函数：zh=中文, en=英文
+    function t(zh, en) {
       const lang = localStorage.getItem('lang') || 'zh';
-      if (lang === 'ar') return ar;
-      if (lang === 'en') return en;
-      return zh;
+      return lang === 'en' ? en : zh;
     }
 
     // 立即读取 config 和 products 注入页面
@@ -35,19 +33,16 @@
 
     function renderPage(config, products) {
       const lang = localStorage.getItem('lang') || 'zh';
-      const dir = lang === 'ar' ? 'rtl' : 'ltr';
-
-      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
-      document.documentElement.dir = dir;
-      document.title = t(config.site.name_zh, config.site.name_en, config.site.name_zh) + t(' - 4K视频素材', ' - 4K Video Footage', ' - قطع فيديو 4K');
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      document.documentElement.dir = 'ltr';
+      document.title = t(config.site.name_zh, config.site.name_en) + t(' - 4K视频素材', ' - 4K Video Footage');
 
       // Meta description
       const metaDesc = document.getElementById('meta-desc');
       if (metaDesc) {
         metaDesc.setAttribute('content', t(
           config.site.tagline_zh,
-          config.seo.description_en,
-          config.site.tagline_zh
+          config.seo.description_en
         ));
       }
 
@@ -64,57 +59,57 @@
       const productCard = (p) => `
         <div class="card" data-id="${p.id}">
           <div class="thumb-wrap">
-            <img src="${p.thumbnail}" alt="${t(p.title_zh, p.title_en, p.title_zh)}" loading="lazy" />
+            <img src="${p.thumbnail}" alt="${t(p.title_zh, p.title_en)}" loading="lazy" />
             <span class="badge">${p.resolution}</span>
             <span class="duration">${p.duration}</span>
           </div>
           <div class="card-body">
-            <h3>${t(p.title_zh, p.title_en, p.title_zh)}</h3>
-            <p>${(t(p.description_zh, p.description_en, p.description_zh) || '').substring(0, 90)}...</p>
+            <h3>${t(p.title_zh, p.title_en)}</h3>
+            <p>${(t(p.description_zh, p.description_en) || '').substring(0, 90)}...</p>
             <div class="card-foot">
               <span class="price">$${p.price}</span>
               <a class="btn-wa" target="_blank" rel="noopener"
-                 href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我想购买：', 'Hi, I want to buy: ', 'مرحباً، أريد شراء: ') + t(p.title_zh, p.title_en, p.title_zh) + t('（编号：', ' (ID:', ' (الرقم: ') + p.id + t('）', ')', ')'))}"
-                 onclick="trackLead(${p.id}, '${t(p.title_zh, p.title_en, p.title_zh).replace(/'/g, '')}')">
+                 href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我想购买：', 'Hi, I want to buy: ') + t(p.title_zh, p.title_en) + t('（编号：', ' (ID:', ')') + p.id + ')')}"
+                 onclick="trackLead(${p.id}, '${t(p.title_zh, p.title_en).replace(/'/g, '')}')">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
-                ${t('购买', 'Buy', 'اشترِ')}
+                ${t('购买', 'Buy')}
               </a>
             </div>
           </div>
         </div>
       `;
 
-      const langBtnText = lang === 'zh' ? 'EN' : (lang === 'en' ? 'العربية' : '中文');
+      const langBtnText = lang === 'zh' ? 'EN' : '中文';
 
       document.body.innerHTML = `
         <header class="topbar">
-          <div class="logo">${t(config.site.name_zh, config.site.name_en, config.site.name_zh)}</div>
+          <div class="logo">${t(config.site.name_zh, config.site.name_en)}</div>
           <nav class="topbar-nav">
-            <a href="index.html" class="nav-link active">${t('视频', 'Videos', 'الفيديوهات')}</a>
-            <a href="tools.html" class="nav-link">${t('工具', 'Tools', 'الأدوات')}</a>
+            <a href="index.html" class="nav-link active">${t('视频', 'Videos')}</a>
+            <a href="tools.html" class="nav-link">${t('工具', 'Tools')}</a>
           </nav>
           <div class="topbar-actions">
             <button class="lang-toggle" onclick="toggleLang()">${langBtnText}</button>
             <a class="wa-top" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
-              ${t('WhatsApp', 'WhatsApp', 'واتساب')}
+              WhatsApp
             </a>
           </div>
         </header>
 
         <section class="hero">
-          <h1>${t(config.site.name_zh, config.site.name_en, config.site.name_zh)}</h1>
-          <p>${t(config.site.tagline_zh, config.site.tagline_en, config.site.tagline_zh)}</p>
+          <h1>${t(config.site.name_zh, config.site.name_en)}</h1>
+          <p>${t(config.site.tagline_zh, config.site.tagline_en)}</p>
           <div class="hero-stats">
-            <div><strong>${all.length}+</strong><span>${t('视频素材', 'Videos', 'فيديو')}</span></div>
-            <div><strong>4K</strong><span>${t('超高清', 'Resolution', 'الدقة')}</span></div>
-            <div><strong>${t('即时', 'Instant', 'فوري')}</strong><span>${t('交付', 'Delivery', 'التسليم')}</span></div>
+            <div><strong>${all.length}+</strong><span>${t('视频素材', 'Videos')}</span></div>
+            <div><strong>4K</strong><span>${t('超高清', 'Resolution')}</span></div>
+            <div><strong>${t('即时', 'Instant')}</strong><span>${t('交付', 'Delivery')}</span></div>
           </div>
         </section>
 
         ${featured.length > 0 ? `
         <section class="section">
-          <h2 class="section-title">${t('精选视频', 'Featured Videos', 'الفيديوهات المميزة')}</h2>
+          <h2 class="section-title">${t('精选视频', 'Featured Videos')}</h2>
           <div class="grid">
             ${featured.map(productCard).join('')}
           </div>
@@ -122,9 +117,9 @@
         ` : ''}
 
         <section class="section">
-          <h2 class="section-title">${t('全部视频', 'All Videos', 'جميع الفيديوهات')}</h2>
+          <h2 class="section-title">${t('全部视频', 'All Videos')}</h2>
           <div class="search-box">
-            <input type="text" id="search" placeholder="${t('搜索视频...', 'Search videos...', 'ابحث عن فيديو...')}" />
+            <input type="text" id="search" placeholder="${t('搜索视频...', 'Search videos...')}" />
           </div>
           <div class="grid" id="all-grid">
             ${all.map(productCard).join('')}
@@ -132,18 +127,18 @@
         </section>
 
         <section class="cta-section">
-          <h2>${t('需要定制视频？', 'Need Custom Footage?', 'تحتاج لقطات مخصصة؟')}</h2>
-          <p>${t('联系我们的 WhatsApp，获取定制需求和批量价格。', 'Contact us on WhatsApp for custom requests and bulk pricing.', 'تواصل معنا عبر واتساب للطلبات المخصصة والأسعار بالجملة.')}</p>
-          <a class="btn-cta" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我需要定制4K视频素材', 'Hi, I need custom 4K footage', 'مرحباً، أحتاج لقطات 4K مخصصة'))}">
-            ${t('WhatsApp 联系我们', 'Contact on WhatsApp', 'تواصل عبر واتساب')}
+          <h2>${t('需要定制视频？', 'Need Custom Footage?')}</h2>
+          <p>${t('联系我们的 WhatsApp，获取定制需求和批量价格。', 'Contact us on WhatsApp for custom requests and bulk pricing.')}</p>
+          <a class="btn-cta" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我需要定制4K视频素材', 'Hi, I need custom 4K footage'))}">
+            ${t('WhatsApp 联系我们', 'Contact on WhatsApp')}
           </a>
         </section>
 
         <footer>
-          <p>© ${new Date().getFullYear()} ${t(config.site.name_zh, config.site.name_en, config.site.name_zh)}. ${t('保留所有权利。', 'All rights reserved.', 'جميع الحقوق محفوظة.')}</p>
+          <p>&copy; ${new Date().getFullYear()} ${t(config.site.name_zh, config.site.name_en)}. ${t('保留所有权利。', 'All rights reserved.')}</p>
         </footer>
 
-        <a class="wa-float" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我对你们的4K视频感兴趣', 'Hi, I am interested in your 4K videos', 'مرحباً، أنا مهتم بفيديوهات 4K الخاصة بكم'))}" onclick="trackContact()" aria-label="WhatsApp">
+        <a class="wa-float" target="_blank" rel="noopener" href="${config.contact.whatsapp_url}?text=${encodeURIComponent(t('你好，我对你们的4K视频感兴趣', 'Hi, I am interested in your 4K videos'))}" onclick="trackContact()" aria-label="WhatsApp">
           <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
         </a>
       `;
@@ -163,8 +158,7 @@
 
     function toggleLang() {
       const cur = localStorage.getItem('lang') || 'zh';
-      // 循环切换：中文 → 英文 → 阿拉伯语 → 中文
-      const next = cur === 'zh' ? 'en' : (cur === 'en' ? 'ar' : 'zh');
+      const next = cur === 'zh' ? 'en' : 'zh';
       localStorage.setItem('lang', next);
       location.reload();
     }

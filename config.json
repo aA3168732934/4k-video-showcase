@@ -2,10 +2,8 @@
   "site": {
     "name_zh": "4K视频素材库",
     "name_en": "4K Video Showcase",
-    "name_ar": "مكتبة فيديو 4K",
     "tagline_zh": "为创作者提供高品质4K视频素材",
     "tagline_en": "Premium 4K stock footage for creators",
-    "tagline_ar": "لقطات فيديو 4K متميزة للمبدعين",
     "domain": "https://yourdomain.com"
   },
   "contact": {
@@ -13,7 +11,6 @@
     "whatsapp_group": "https://chat.whatsapp.com/INVITE_LINK_HERE",
     "whatsapp_label_zh": "WhatsApp 联系",
     "whatsapp_label_en": "Chat on WhatsApp",
-    "whatsapp_label_ar": "تواصل عبر واتساب",
     "email": "contact@yourdomain.com",
     "telegram": "https://t.me/yourusername"
   },
@@ -26,10 +23,8 @@
   "seo": {
     "title_zh": "4K视频素材库 - 高品质正版素材",
     "title_en": "4K Video Library - Premium Stock Footage",
-    "title_ar": "مكتبة فيديو 4K - لقطات متميزة",
     "description_zh": "浏览100+高品质4K视频素材，包含自然、城市、商务、生活等类型，即时交付。",
     "description_en": "Browse 100+ premium 4K video clips for your projects. Nature, city, business, lifestyle footage available for instant delivery.",
-    "description_ar": "تصفح أكثر من 100 مقطع فيديو 4K متميز لمشاريعك. لقطات طبيعية ومدينة وأعمال ومعيشة متاحة للتسليم الفوري.",
     "keywords": "4k video, stock footage, premium video, 视频素材, 中东4K视频, 跨境电商工具"
   },
   "appearance": {
