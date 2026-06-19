@@ -6,6 +6,13 @@
   <title>加载中...</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="tools.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="js/product-selection.js"></script>
+  <script src="js/competitor-analysis.js"></script>
+  <script src="js/multi-platform.js"></script>
+  <script src="js/data-analysis.js"></script>
+  <script src="js/automation.js"></script>
 </head>
 <body>
   <div class="lang-loading">加载中...</div>
@@ -180,189 +187,41 @@
     }
 
     function openTool(toolId) {
-      const lang = localStorage.getItem('lang') || 'zh';
+      const modalBody = document.getElementById('modal-body');
+      if (!modalBody) return;
 
-      const toolContents = {
-        'product-selection': {
-          title_zh: '选品工具',
-          title_en: 'Product Selection Tool',
-          content: `
-            <h2>${t('选品工具', 'Product Selection Tool')}</h2>
-            <div class="tool-form">
-              <div class="form-group">
-                <label>${t('商品类目', 'Product Category')}</label>
-                <select>
-                  <option>${t('电子产品', 'Electronics')}</option>
-                  <option>${t('时尚服饰', 'Fashion')}</option>
-                  <option>${t('家居园艺', 'Home & Garden')}</option>
-                  <option>${t('美妆健康', 'Beauty & Health')}</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>${t('目标市场', 'Target Market')}</label>
-                <select>
-                  <option>USA</option>
-                  <option>UAE</option>
-                  <option>Saudi Arabia</option>
-                  <option>Europe</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>${t('价格区间（美元）', 'Price Range (USD)')}</label>
-                <input type="range" min="0" max="1000" value="100">
-              </div>
-              <button class="btn-cta" onclick="showToolResult('product-selection')">${t('开始分析', 'Analyze')}</button>
-            </div>
-            <div id="tool-result"></div>
-          `
-        },
-        'competitor-analysis': {
-          title_zh: '竞品分析',
-          title_en: 'Competitor Analysis Tool',
-          content: `
-            <h2>${t('竞品分析工具', 'Competitor Analysis Tool')}</h2>
-            <div class="tool-form">
-              <div class="form-group">
-                <label>${t('竞品店铺链接', 'Competitor Store URL')}</label>
-                <input type="text" placeholder="https://...">
-              </div>
-              <div class="form-group">
-                <label>${t('平台', 'Platform')}</label>
-                <select>
-                  <option>Amazon</option>
-                  <option>Shopee</option>
-                  <option>Lazada</option>
-                  <option>eBay</option>
-                </select>
-              </div>
-              <button class="btn-cta" onclick="showToolResult('competitor-analysis')">${t('开始分析', 'Analyze')}</button>
-            </div>
-            <div id="tool-result"></div>
-          `
-        },
-        'multi-platform': {
-          title_zh: '多平台管理',
-          title_en: 'Multi-Platform Manager',
-          content: `
-            <h2>${t('多平台管理', 'Multi-Platform Manager')}</h2>
-            <div class="tool-form">
-              <p style="color:var(--text-dim);margin-bottom:20px">${t('连接你的店铺，一站式管理。', 'Connect your stores to manage them from one place.')}</p>
-              <div class="platform-cards">
-                <div class="platform-card">
-                  <h3>Amazon</h3>
-                  <button class="btn-connect">${t('连接', 'Connect')}</button>
-                </div>
-                <div class="platform-card">
-                  <h3>Shopee</h3>
-                  <button class="btn-connect">${t('连接', 'Connect')}</button>
-                </div>
-                <div class="platform-card">
-                  <h3>Lazada</h3>
-                  <button class="btn-connect">${t('连接', 'Connect')}</button>
-                </div>
-                <div class="platform-card">
-                  <h3>eBay</h3>
-                  <button class="btn-connect">${t('连接', 'Connect')}</button>
-                </div>
-              </div>
-            </div>
-          `
-        },
-        'data-analysis': {
-          title_zh: '数据分析',
-          title_en: 'Data Analytics Tool',
-          content: `
-            <h2>${t('数据分析工具', 'Data Analytics Tool')}</h2>
-            <div class="tool-form">
-              <div class="form-group">
-                <label>${t('上传销售数据（CSV）', 'Upload Sales Data (CSV)')}</label>
-                <input type="file" accept=".csv">
-              </div>
-              <div class="form-group">
-                <label>${t('分析类型', 'Analysis Type')}</label>
-                <select>
-                  <option>${t('销售趋势', 'Sales Trend')}</option>
-                  <option>${t('利润分析', 'Profit Analysis')}</option>
-                  <option>${t('地区分布', 'Regional Distribution')}</option>
-                </select>
-              </div>
-              <button class="btn-cta" onclick="showToolResult('data-analysis')">${t('开始分析', 'Analyze')}</button>
-            </div>
-            <div id="tool-result"></div>
-          `
-        },
-        'automation': {
-          title_zh: '自动化工具',
-          title_en: 'Automation Tools',
-          content: `
-            <h2>${t('自动化工具', 'Automation Tools')}</h2>
-            <div class="tool-form">
-              <div class="automation-options">
-                <div class="auto-option">
-                  <h3>${t('自动回复', 'Auto-Reply')}</h3>
-                  <p>${t('根据关键词自动回复客户消息。', 'Automatically reply to customer messages based on keywords.')}</p>
-                  <button class="btn-connect">${t('设置', 'Setup')}</button>
-                </div>
-                <div class="auto-option">
-                  <h3>${t('订单同步', 'Order Sync')}</h3>
-                  <p>${t('将所有平台的订单同步到一个面板。', 'Sync orders from all platforms to one dashboard.')}</p>
-                  <button class="btn-connect">${t('设置', 'Setup')}</button>
-                </div>
-                <div class="auto-option">
-                  <h3>${t('评价邀请', 'Review Request')}</h3>
-                  <p>${t('自动向客户发送评价邀请邮件。', 'Automatically send review request emails to customers.')}</p>
-                  <button class="btn-connect">${t('设置', 'Setup')}</button>
-                </div>
-              </div>
-            </div>
-          `
-        }
-      };
+      let html = '';
+      switch(toolId) {
+        case 'product-selection':  html = renderProductSelection(); break;
+        case 'competitor-analysis': html = renderCompetitorAnalysis(); break;
+        case 'multi-platform':      html = renderMultiPlatform(); break;
+        case 'data-analysis':      html = renderDataAnalysis(); break;
+        case 'automation':        html = renderAutomation(); break;
+      }
 
-      const tool = toolContents[toolId];
-      if (!tool) return;
-
-      document.getElementById('modal-body').innerHTML = tool.content;
+      modalBody.innerHTML = html;
       document.getElementById('tool-modal').classList.add('active');
+
+      // 初始化搜索/渲染
+      if (toolId === 'product-selection')  psSearch();
+      if (toolId === 'competitor-analysis') caSearch();
+      if (toolId === 'data-analysis')       setTimeout(() => { try { daRenderCharts(); } catch(e) {} }, 300);
     }
 
     function closeTool() {
       document.getElementById('tool-modal').classList.remove('active');
     }
 
-    function showToolResult(toolId) {
-      const lang = localStorage.getItem('lang') || 'zh';
-
-      document.getElementById('tool-result').innerHTML = `
-        <div class="result-box">
-          <h3>${t('分析结果', 'Analysis Result')}</h3>
-          <p style="color:var(--text-dim)">${t('这是演示结果。联系我们的 WhatsApp 获取该工具的完整访问权限。', 'This is a demo result. Contact us on WhatsApp to get full access to this tool.')}</p>
-          <div style="margin-top:20px;padding:20px;background:var(--card);border-radius:8px;">
-            <p>📊 ${t('此处将显示数据可视化结果。', 'Sample data visualization would appear here.')}</p>
-          </div>
-          <a class="btn-cta" style="margin-top:20px;display:inline-block" target="_blank" href="#" onclick="trackLead()">
-            ${t('WhatsApp 获取完整权限', 'Get Full Access on WhatsApp')}
-          </a>
-        </div>
-      `;
-    }
-
     function trackLead() {
-      if (typeof fbq !== 'undefined') {
-        fbq('track', 'Lead');
-      }
+      if (typeof fbq !== 'undefined') fbq('track', 'Lead');
     }
 
     function trackContact() {
-      if (typeof fbq !== 'undefined') {
-        fbq('track', 'Contact');
-      }
+      if (typeof fbq !== 'undefined') fbq('track', 'Contact');
     }
 
     document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('tool-modal')) {
-        closeTool();
-      }
+      if (e.target.classList.contains('tool-modal')) closeTool();
     });
   </script>
 
